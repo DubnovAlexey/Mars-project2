@@ -1,0 +1,386 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
+
+/* ======= Общие стили страницы ======= */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #fefefe;
+    color: #333;
+    line-height: 1.6;
+    text-align: center;
+    /*font-size: 18px;*/
+    margin: 0;
+    padding: 0;
+
+    /* Улучшенный стиль основного текста для страницы */
+
+    font-size: 1.125rem; /* Увеличение базового размера шрифта */
+    line-height: 1.7; /* Увеличение межстрочного интервала для читаемости */
+}
+
+header, footer {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Mars%2C_Jezero_Crater_-_Nasa%E2%80%99s_Perseverance_SOL_168_%2851383685664%29.png/1600px-Mars%2C_Jezero_Crater_-_Nasa%E2%80%99s_Perseverance_SOL_168_%2851383685664%29.png?20240215215317');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 2rem;
+    border-bottom: 5px solid #b22222;
+    font-family: 'Orbitron', sans-serif;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ======= Заголовки и статьи ======= */
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: #b22222;
+    font-size: 1.6rem;
+    padding: 0.5rem;
+    margin: 2rem 0 1rem;
+    background-color: #ffe4e1;
+    border-left: 5px solid #b22222;
+    text-align: left;
+}
+
+article {
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+/* ======= Изображения ======= */
+img {
+    width: 100%;
+    max-width: 500px;
+    border: 3px solid #b22222;
+    border-radius: 12px;
+    padding: 5px;
+    background-color: #fff;
+    display: block;
+    margin: 1rem auto;
+}
+
+/* ======= Галерея ======= */
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+.gallery img {
+    flex: 1 1 240px;
+    max-width: 300px;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+}
+
+/* ======= Таблицы ======= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background-color: #fff;
+    border: 2px solid #b22222;
+}
+
+th, td {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+th {
+    background-color: #ffdede;
+}
+
+/* ======= Ссылки ======= */
+a {
+    color: #8B0000;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ======= Кнопка Back-to-Top ======= */
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #8B0000;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+    background: #b22222;
+    cursor: pointer;
+}
+
+/* ======= Навигационное меню ======= */
+.site-nav {
+    text-align: center;
+    padding: 0.5rem;
+    overflow-x: auto; /* Горизонтальная прокрутка */
+    -webkit-overflow-scrolling: touch; /* плавная прокрутка на мобильных */
+}
+
+.site-nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.5rem;
+    flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+}
+
+.site-nav li.nav-item {
+    margin: 0;
+    flex: 0 0 auto; /* Не растягиваем кнопки */
+}
+
+.site-nav a.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: clamp(12px, 2vw, 18px);
+    height: 3rem;
+    min-width: 5rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    transition: all 0.3s ease;
+}
+
+.site-nav a.nav-link:hover {
+    color: #b22222;
+}
+
+.site-nav a.nav-link.active {
+    color: rgb(236, 164, 10);
+    text-decoration: underline;
+}
+
+/* ======= Прочие элементы ======= */
+.note-static {
+    position: static;
+    border-left: 4px solid #bbb;
+}
+
+.card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.badge-abs {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: #8B0000;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    z-index: 2;
+}
+
+.figure-wrap {
+    position: relative;
+    max-width: 500px;
+    margin: 1rem auto;
+}
+
+.figure-caption {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 0.25rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+.tagline {
+    margin: 1rem 0 0;
+    opacity: .9;
+}
+
+.brand {
+    color: #b22222;
+    font-size: 2.5rem;
+    letter-spacing: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.img-left {
+    width: 250px;
+    float: left;
+    margin: 0 2rem 1rem 0;
+}
+/*
+------mars----
+
+ */
+
+/*.mars-card {*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 8px;*/
+/*    padding: 15px;*/
+/*    background: #fff;*/
+/*    text-align: justify; !* выравнивание текста *!*/
+/*    box-shadow: 0 2px 6px rgba(0,0,0,0.1);*/
+/*}*/
+
+/*.mars-text {*/
+/*    max-height: 400px;      !* ограничение по высоте *!*/
+/*    overflow-y: auto;       !* скролл, если текста больше *!*/
+/*    padding-right: 5px;     !* чтобы скролл не налезал на текст *!*/
+/*}*/
+
+
+
+
+/* Улучшенные стили для карточек мифов */
+.mars-card {
+    position: relative;
+    overflow: hidden; /* Скрываем изначальный выход за границы */
+    background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+    border: 2px solid #b22222; /* Акцентная граница */
+    border-radius: 12px;
+    padding: 25px; /* Увеличенные отступы */
+    text-align: left; /* Вернем выравнивание по левому краю для лучшей читаемости */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Более выраженная тень */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1; /* Базовый z-index для карточек */
+}
+
+/* При наведении на саму карточку (любой интерактивный элемент внутри) */
+.mars-card:hover {
+    transform: scale(1.05); /* Легкое увеличение всей карточки */
+    z-index: 5; /* Поднимаем карточку немного выше */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Обновленная тень */
+    overflow: visible; /* Разрешаем содержимому выходить за границы */
+}
+
+/* Добавим стили для заголовков внутри карточек */
+.mars-card h3 {
+    color: #b22222; /* Заголовки мифов в том же цвете, что и основной акцент */
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ccc;
+}
+
+/* Сделаем ссылки "Learn More" более заметными */
+.mars-card a.mt-auto {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #b22222;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.mars-card a.mt-auto:hover {
+    background-color: #8B0000;
+    transform: translateY(-2px);
+}
+
+
+
+
+/* Стили для изображений внутри карточек мифов */
+.mars-card img {
+    border: 3px solid #ccc; /* Более мягкая граница */
+    border-radius: 12px;
+    padding: 3px;
+    background-color: #f0f0f0;
+    margin: 1.5rem auto;
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Добавляем плавный переход для эффекта увеличения */
+    transition: transform 0.3s ease, z-index 0s 0.3s;
+    /* По умолчанию изображения не выходят за границы */
+    z-index: 1;
+}
+/* Эффект при наведении мыши на изображение */
+.mars-card img:hover {
+    transform: scale(1.5); /* Увеличивает изображение в 1.5 раза */
+
+}
+
+.mars-card .video-container:hover {
+    transform: scale(1.5); /* Увеличивает видео */
+}
+
+
+
+/* Контейнер для видео с эффектом расширения video */
+.video-container {
+    position: relative;
+    padding-bottom: 75%; /* Увеличиваем высоту видео. 75% вместо 56.25% (стандарт 16x9) */
+    height: 0;
+    overflow: hidden;
+    transition: transform 0.3s ease; /* Плавный переход для видео-контейнера */
+}
+
+/* Стили для iframe внутри контейнера */
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* При наведении на видео внутри карточки */
+.video-container:hover {
+    transform: scale(1.15); /* Увеличиваем видео в 1.15 раза */
+    /* z-index уже управляется на уровне .mars-card:hover */
+}
+
+.video-container:hover iframe {
+    transform: scale(2.0); /* Увеличивает видео в 2 раза */
+
+}
+
+.z-index-group {
+    transition: z-index 0s 0.2s; /* Плавный переход для z-index */
+    z-index: 1; /* По умолчанию находится на одном уровне */}
+/* При наведении поднимаем всю колонку, а не только видео */
+.z-index-group:hover {
+    z-index: 10; /* Поднимаем колонку на передний план */
+}
