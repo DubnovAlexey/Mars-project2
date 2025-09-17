@@ -16,7 +16,10 @@
         // Удаляем старые audio (кроме тех, что помечены data-keep="true")
         document.querySelectorAll("audio").forEach(a => {
             if (a.hasAttribute("data-keep")) return;
-            try { a.pause(); } catch (e) {}
+            try {
+                a.pause();
+            } catch (e) {
+            }
             if (a.parentNode) a.remove();
         });
 
@@ -120,11 +123,11 @@
         // ---------------------- Playlist selection logic ----------------------
         // choose playlist for page: page playlist -> globalPlaylist -> fallback default
         const defaultPlaylist = [
-            { src: "../music/33.mp3", title: "Mars Breeze (33)" },
-            { src: "../music/11.mp3", title: "Red Plains (444)" },
-            { src: "../music/777.mp3", title: "Orbit Echo (track3)" },
-            { src: "../music/888.mp3", title: "Dust Trail (track4)" },
-            { src: "../music/999.mp3", title: "Night Crater (track5)" }
+            {src: "../music/33.mp3", title: "Mars Breeze (33)"},
+            {src: "../music/11.mp3", title: "Red Plains (444)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
+            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
+            {src: "../music/999.mp3", title: "Night Crater (track5)"}
         ]
 
 
@@ -149,7 +152,10 @@
             savedPlaylistId = localStorage.getItem("siteAudioPlaylistId");
             savedIndex = parseInt(localStorage.getItem("siteAudioIndex"), 10);
             if (isNaN(savedIndex)) savedIndex = null;
-        } catch (e) { savedPlaylistId = null; savedIndex = null; }
+        } catch (e) {
+            savedPlaylistId = null;
+            savedIndex = null;
+        }
 
         let currentIndex = 0;
         if (savedPlaylistId && savedPlaylistId === playlistId && savedIndex !== null) {
@@ -171,7 +177,8 @@
             try {
                 localStorage.setItem("siteAudioPlaylistId", playlistId);
                 localStorage.setItem("siteAudioIndex", String(currentIndex));
-            } catch (e) {}
+            } catch (e) {
+            }
         }
 
         function setTrack(index) {
@@ -198,6 +205,7 @@
             // try to autoplay next
             audioEl.play().then(() => updateToggleText()).catch(() => updateToggleText());
         }
+
         function prevTrack() {
             setTrack(currentIndex - 1);
             audioEl.play().then(() => updateToggleText()).catch(() => updateToggleText());
@@ -206,9 +214,17 @@
         // init volume from storage if present
         try {
             const savedVol = localStorage.getItem("siteAudioVol");
-            if (savedVol !== null) { audioEl.volume = parseFloat(savedVol); volRange.value = savedVol; }
-            else { audioEl.volume = 0.5; volRange.value = 0.5; }
-        } catch (e) { audioEl.volume = 0.5; volRange.value = 0.5; }
+            if (savedVol !== null) {
+                audioEl.volume = parseFloat(savedVol);
+                volRange.value = savedVol;
+            } else {
+                audioEl.volume = 0.5;
+                volRange.value = 0.5;
+            }
+        } catch (e) {
+            audioEl.volume = 0.5;
+            volRange.value = 0.5;
+        }
 
         // set initial track
         setTrack(currentIndex);
@@ -217,6 +233,7 @@
         function updateToggleText() {
             toggleBtn.textContent = audioEl.paused ? "Play" : "Pause";
         }
+
         updateToggleText();
 
         // try resume if user wanted playback
@@ -229,7 +246,8 @@
                     updateToggleText();
                 });
             }
-        } catch (e) {}
+        } catch (e) {
+        }
 
         // audio events
         audioEl.addEventListener("ended", nextTrack);
@@ -243,24 +261,37 @@
         toggleBtn.addEventListener("click", () => {
             if (audioEl.paused) {
                 audioEl.play().then(() => {
-                    try { localStorage.setItem("siteAudioPlaying", "true"); } catch (e) {}
+                    try {
+                        localStorage.setItem("siteAudioPlaying", "true");
+                    } catch (e) {
+                    }
                     updateToggleText();
                 }).catch(err => {
                     console.warn("Play failed:", err);
                 });
             } else {
                 audioEl.pause();
-                try { localStorage.setItem("siteAudioPlaying", "false"); } catch (e) {}
+                try {
+                    localStorage.setItem("siteAudioPlaying", "false");
+                } catch (e) {
+                }
                 updateToggleText();
             }
         });
 
-        nextBtn.addEventListener("click", () => { nextTrack(); });
-        prevBtn.addEventListener("click", () => { prevTrack(); });
+        nextBtn.addEventListener("click", () => {
+            nextTrack();
+        });
+        prevBtn.addEventListener("click", () => {
+            prevTrack();
+        });
 
         volRange.addEventListener("input", () => {
             audioEl.volume = parseFloat(volRange.value);
-            try { localStorage.setItem("siteAudioVol", volRange.value); } catch (e) {}
+            try {
+                localStorage.setItem("siteAudioVol", volRange.value);
+            } catch (e) {
+            }
         });
 
         // ---------------------- navigation saving (when clicking menu links) ----------------------
@@ -283,7 +314,8 @@
                     localStorage.setItem("siteAudioIndex", String(startIndex));
                     // if currently playing -> keep play flag; otherwise keep 'false'
                     localStorage.setItem("siteAudioPlaying", (!audioEl.paused).toString());
-                } catch (e) {}
+                } catch (e) {
+                }
                 // navigation proceeds normally
             });
         });
