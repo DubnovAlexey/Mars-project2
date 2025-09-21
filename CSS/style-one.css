@@ -209,7 +209,7 @@ a:hover {
 
 /* Применяем hover-эффекты ко всем изображениям и видео во всех карточках */
 .card img:hover {
-    transform: scale(1.15); /* Увеличивает изображение */
+    transform: scale(1.25); /* Увеличивает изображение */
 }
 
 .card .video-container:hover {
@@ -357,7 +357,7 @@ a:hover {
 
 /* При наведении увеличиваем видео, а не контейнер */
 .video-container:hover iframe {
-    transform: scale(1.15);
+    transform: scale(1.25);
     z-index: 10;
 }
 
@@ -394,8 +394,3 @@ a:hover {
     z-index: 10;
 }
 
-/*!* Эффект при наведении мыши на изображения в статьях *!*/
-/*.img-left:hover, .img-right:hover {*/
-/*    transform: scale(1.15); !* Увеличивает изображение при наведении *!*/
-/*    z-index: 10; !* Поднимает элемент на передний план *!*/
-/*}*/
