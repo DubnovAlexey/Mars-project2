@@ -132,6 +132,32 @@ a:hover {
     background: #b22222;
     cursor: pointer;
 }
+/* audio button
+----------todo---------
+
+ */
+/*.audio-player-fixed:hover {*/
+/*    transform: scale(1.05); !* Легкое увеличение при наведении *!*/
+/*}*/
+
+/*!* Стили для самого аудио-тега внутри контейнера *!*/
+/*.audio-player-fixed audio {*/
+/*    width: 250px;*/
+/*    height: 40px;*/
+/*}*/
+
+/*!* Адаптивность для маленьких экранов *!*/
+/*@media (max-width: 600px) {*/
+/*    .audio-player-fixed {*/
+/*        left: 10px;*/
+/*        right: 10px;*/
+/*        width: auto; !* Позволяет плееру растягиваться на всю ширину *!*/
+/*    }*/
+
+/*    .audio-player-fixed audio {*/
+/*        width: 100%;*/
+/*    }*/
+/*}*/
 
 /* ======= Навигационное меню ======= */
 .site-nav {
