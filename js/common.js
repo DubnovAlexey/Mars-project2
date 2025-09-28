@@ -239,29 +239,34 @@
         // try resume if user wanted playback
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
-            //
+
 
             if (isPlaying) {
-                // Оборачиваем play() в .catch() для корректной обработки политики Autoplay
-                audioEl.play().catch(error => {
-                    // Если браузер заблокировал автозапуск (NotAllowedError или AbortError)
+                // Пытаемся запустить воспроизведение, обрабатывая результат через Promise
+                audioEl.play().then(() => {
+                    // УСПЕХ: Воспроизведение разрешено. Устанавливаем иконку "Пауза".
+                    playBtn.innerHTML = '❚❚';
+                }).catch(error => {
+                    // ПРЕДОТВРАЩЕНИЕ: Браузер заблокировал автозапуск (NotAllowedError или AbortError)
                     if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
-                        console.info("Автовоспроизведение заблокировано браузером. Нажмите Play.");
+                        console.info("Автовоспроизведение заблокировано браузером. Для запуска нажмите Play.");
 
-                        // 1. Возвращаем кнопку в состояние "Play"
+                        // Если заблокировано, устанавливаем кнопку на "Play"
                         playBtn.innerHTML = '▶';
 
-                        // 2. Сбрасываем флаг в localStorage, чтобы при следующем переходе не было попытки автозапуска
+                        // Сбрасываем флаг в localStorage
                         try {
                             localStorage.setItem("siteAudioPlaying", "false");
-                        } catch (e) {} // Обрабатываем ошибку localStorage
+                        } catch (e) {}
                     } else {
-                        console.error("Ошибка воспроизведения:", error);
+                        // Другие ошибки воспроизведения
+                        console.error("Непредвиденная ошибка воспроизведения:", error);
+                        playBtn.innerHTML = '▶';
                     }
                 });
-                // Устанавливаем иконку паузы. Если play() заблокирован, код в .catch() выше вернет ее на "Play".
-                playBtn.innerHTML = '❚❚';
+
             } else {
+                // Если isPlaying = false, просто ставим кнопку на "Play"
                 playBtn.innerHTML = '▶';
             }
 
