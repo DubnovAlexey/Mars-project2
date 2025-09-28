@@ -123,11 +123,11 @@
         // ---------------------- Playlist selection logic ----------------------
         // choose playlist for page: page playlist -> globalPlaylist -> fallback default
         const defaultPlaylist = [
-            {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (11)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
-            {src: "../music/888.mp3", title: "Dust Trail (888)"},
-            {src: "../music/999.mp3", title: "Night Crater (999)"}
+            {src: "/music/33.mp3", title: "Mars Breeze (33)"},
+            {src: "/music/11.mp3", title: "Red Plains (11)"},
+            {src: "/music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "/music/888.mp3", title: "Dust Trail (888)"},
+            {src: "/music/999.mp3", title: "Night Crater (999)"}
         ]
 
 
@@ -239,13 +239,38 @@
         // try resume if user wanted playback
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
-            if (wasPlaying) {
-                audioEl.play().then(updateToggleText).catch(err => {
-                    // autoplay may be blocked -> user must press Play; still update UI
-                    console.warn("Autoplay prevented:", err);
-                    updateToggleText();
+            //
+
+            if (isPlaying) {
+                // Оборачиваем play() в .catch() для корректной обработки политики Autoplay
+                audioEl.play().catch(error => {
+                    // Если браузер заблокировал автозапуск (NotAllowedError или AbortError)
+                    if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
+                        console.info("Автовоспроизведение заблокировано браузером. Нажмите Play.");
+
+                        // 1. Возвращаем кнопку в состояние "Play"
+                        playBtn.innerHTML = '▶';
+
+                        // 2. Сбрасываем флаг в localStorage, чтобы при следующем переходе не было попытки автозапуска
+                        try {
+                            localStorage.setItem("siteAudioPlaying", "false");
+                        } catch (e) {} // Обрабатываем ошибку localStorage
+                    } else {
+                        console.error("Ошибка воспроизведения:", error);
+                    }
                 });
+                // Устанавливаем иконку паузы. Если play() заблокирован, код в .catch() выше вернет ее на "Play".
+                playBtn.innerHTML = '❚❚';
+            } else {
+                playBtn.innerHTML = '▶';
             }
+
+            //     audioEl.play().then(updateToggleText).catch(err => {
+            //         // autoplay may be blocked -> user must press Play; still update UI
+            //         console.warn("Autoplay prevented:", err);
+            //         updateToggleText();
+            //     });
+            // }
         } catch (e) {
         }
 
