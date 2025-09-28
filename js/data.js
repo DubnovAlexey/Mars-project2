@@ -7,10 +7,10 @@ window.pageData = {
         title: "Home",
         playlist: [
             {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (444)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-            {src: "../music/999.mp3", title: "Night Crater (track5)"}
+            {src: "../music/11.mp3", title: "Red Plains (11)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "../music/888.mp3", title: "Dust Trail (888)"},
+            {src: "../music/999.mp3", title: "Night Crater (999)"}
         ]
     },
 
@@ -19,10 +19,10 @@ window.pageData = {
         // пример собственного плейлиста для страницы "myths"
         playlist: [
             {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (444)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-            {src: "../music/999.mp3", title: "Night Crater (track5)"}
+            {src: "../music/11.mp3", title: "Red Plains (11)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "../music/888.mp3", title: "Dust Trail (888)"},
+            {src: "../music/999.mp3", title: "Night Crater (999)"}
         ]
     },
 
@@ -30,10 +30,10 @@ window.pageData = {
         title: "History",
         playlist: [
             {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (444)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-            {src: "../music/999.mp3", title: "Night Crater (track5)"}
+            {src: "../music/11.mp3", title: "Red Plains (11)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "../music/888.mp3", title: "Dust Trail (888)"},
+            {src: "../music/999.mp3", title: "Night Crater (999)"}
         ]
     },
 
@@ -42,10 +42,10 @@ window.pageData = {
         // пример: своя последовательность для photos
         playlist: [
             {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (444)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-            {src: "../music/999.mp3", title: "Night Crater (track5)"}
+            {src: "../music/11.mp3", title: "Red Plains (11)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "../music/888.mp3", title: "Dust Trail (888)"},
+            {src: "../music/999.mp3", title: "Night Crater (999)"}
         ]
     },
 
@@ -53,18 +53,18 @@ window.pageData = {
         title: "About The Project",
         playlist: [
             {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "../music/11.mp3", title: "Red Plains (444)"},
-            {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-            {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-            {src: "../music/999.mp3", title: "Night Crater (track5)"}
+            {src: "../music/11.mp3", title: "Red Plains (11)"},
+            {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "../music/888.mp3", title: "Dust Trail (888)"},
+            {src: "../music/999.mp3", title: "Night Crater (999)"}
         ]
     },
     // Глобальный плейлист — используемый по умолчанию
     globalPlaylist: [
         {src: "../music/33.mp3", title: "Mars Breeze (33)"},
-        {src: "../music/11.mp3", title: "Red Plains (444)"},
-        {src: "../music/777.mp3", title: "Orbit Echo (track3)"},
-        {src: "../music/888.mp3", title: "Dust Trail (track4)"},
-        {src: "../music/999.mp3", title: "Night Crater (track5)"}
+        {src: "../music/11.mp3", title: "Red Plains (11)"},
+        {src: "../music/777.mp3", title: "Orbit Echo (777)"},
+        {src: "../music/888.mp3", title: "Dust Trail (888)"},
+        {src: "../music/999.mp3", title: "Night Crater (999)"}
     ]
 };
