@@ -239,36 +239,8 @@
         // try resume if user wanted playback
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
+            //
 
-
-            if (isPlaying) {
-                // Пытаемся запустить воспроизведение, обрабатывая результат через Promise
-                audioEl.play().then(() => {
-                    // УСПЕХ: Воспроизведение разрешено. Устанавливаем иконку "Пауза".
-                    playBtn.innerHTML = '❚❚';
-                }).catch(error => {
-                    // ПРЕДОТВРАЩЕНИЕ: Браузер заблокировал автозапуск (NotAllowedError или AbortError)
-                    if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
-                        console.info("Автовоспроизведение заблокировано браузером. Для запуска нажмите Play.");
-
-                        // Если заблокировано, устанавливаем кнопку на "Play"
-                        playBtn.innerHTML = '▶';
-
-                        // Сбрасываем флаг в localStorage
-                        try {
-                            localStorage.setItem("siteAudioPlaying", "false");
-                        } catch (e) {}
-                    } else {
-                        // Другие ошибки воспроизведения
-                        console.error("Непредвиденная ошибка воспроизведения:", error);
-                        playBtn.innerHTML = '▶';
-                    }
-                });
-
-            } else {
-                // Если isPlaying = false, просто ставим кнопку на "Play"
-                playBtn.innerHTML = '▶';
-            }
 
             //     audioEl.play().then(updateToggleText).catch(err => {
             //         // autoplay may be blocked -> user must press Play; still update UI
