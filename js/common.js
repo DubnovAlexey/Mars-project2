@@ -4,14 +4,6 @@
 // <script src="./js/common.js"></script>
 // <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-// choose playlist for page: page playlist -> globalPlaylist -> fallback default
-const defaultPlaylist = [
-    {src: "/music/33.mp3", title: "Mars Breeze (33)"},
-    {src: "/music/11.mp3", title: "Red Plains (11)"},
-    {src: "/music/777.mp3", title: "Orbit Echo (777)"},
-    {src: "/music/888.mp3", title: "Dust Trail (888)"},
-    {src: "/music/999.mp3", title: "Night Crater (999)"}
-]
 
 (function () {
     // Хэш-функция для page -> стартовый индекс, чтобы страницы начинали с разных треков
