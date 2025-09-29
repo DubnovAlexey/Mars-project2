@@ -4,24 +4,24 @@
 // <script src="./js/common.js"></script>
 // <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-// (function () {
-//     // Хэш-функция для page -> стартовый индекс, чтобы страницы начинали с разных треков
-//     function hashToInt(s) {
-//         let h = 0;
-//         for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-//         return Math.abs(h);
-//     }
-//
-//     function run() {
-//         // Удаляем старые audio (кроме тех, что помечены data-keep="true")
-//         document.querySelectorAll("audio").forEach(a => {
-//             if (a.hasAttribute("data-keep")) return;
-//             try {
-//                 a.pause();
-//             } catch (e) {
-//             }
-//             if (a.parentNode) a.remove();
-//         });
+(function () {
+    // Хэш-функция для page -> стартовый индекс, чтобы страницы начинали с разных треков
+    function hashToInt(s) {
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+        return Math.abs(h);
+    }
+
+    function run() {
+        // Удаляем старые audio (кроме тех, что помечены data-keep="true")
+        document.querySelectorAll("audio").forEach(a => {
+            if (a.hasAttribute("data-keep")) return;
+            try {
+                a.pause();
+            } catch (e) {
+            }
+            if (a.parentNode) a.remove();
+        });
 
         // ----------------------- HEADER (вставляем если нет) -----------------------
         if (!document.getElementById("site-header-container")) {
