@@ -4,7 +4,6 @@
 // <script src="./js/common.js"></script>
 // <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-
 (function () {
     // Хэш-функция для page -> стартовый индекс, чтобы страницы начинали с разных треков
     function hashToInt(s) {
@@ -23,6 +22,7 @@
             }
             if (a.parentNode) a.remove();
         });
+
         // ----------------------- HEADER (вставляем если нет) -----------------------
         if (!document.getElementById("site-header-container")) {
             const headerHTML = `
