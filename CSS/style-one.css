@@ -19,7 +19,7 @@ body {
 
 header, footer {
     background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
-    url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Mars%2C_Jezero_Crater_-_Nasa%E2%80%99s_Perseverance_SOL_168_%2851383685664%29.png/1600px-Mars%2C_Jezero_Crater_-_Nasa%E2%80%99s_Perseverance_SOL_168_%2851383685664%29.png?20240215215317');
+    url('../Images/mars-krater-zvezdy.webp');
     background-size: cover;
     background-position: center;
     color: white;

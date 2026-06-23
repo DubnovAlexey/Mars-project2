@@ -13,7 +13,7 @@ const galleryPhotos = [
         alt: "Curiosity's 'Postcard' of 'Marker Band Valley'"
     },
     {
-        src: "https://photojournal.jpl.nasa.gov/jpegMod/PIA26632_modest.jpg",
+        src: "https://science.nasa.gov/photojournal/nasas-perseverance-rover-snaps-westernmost-selfie/",
         alt: "Curiosity Captures Mars Landscape While Talking to an Orbiter"
     },
     {
@@ -27,7 +27,9 @@ const galleryPhotos = [
 ];
 
 function generateGallery() {
+    console.log("Функция generateGallery запущена!");
     const galleryContainer = document.querySelector('.gallery');
+    console.log("Массив фото:", galleryPhotos);
     galleryContainer.innerHTML = ''; // Очищаем контейнер, чтобы избежать дублирования
 
     const rowOne = document.createElement('div');

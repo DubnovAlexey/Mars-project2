@@ -240,7 +240,7 @@
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
 
-            // --- ИСПРАВЛЕНО: Автовоспроизведение и обработка Promise ---
+            // --- ИСПРАВЛЕНО: Авто воспроизведение и обработка Promise ---
             if (wasPlaying) {
                 audioEl.play().then(updateToggleText).catch(err => {
                     // Autoplay may be blocked -> user must press Play.
