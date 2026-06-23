@@ -1,0 +1,39 @@
+/* ——— ПЛАНЕТА + декор ——— */
+.planet-float {
+    float: right; /* встаёт справа */
+    width: 390px; /* размер планеты (можно 300–380px) */
+    margin: 0 0 2rem 2rem; /* отступ слева, чтобы текст не лип */
+    border-radius: 80%; /* круг */
+    border: 3px solid #b22222; /* марсианская рамка */
+    padding: 6px; /* белая окантовка из фона */
+    background: #fff; /* белая окантовка */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .35), /* мягкая тень под планетой */ inset 0 0 30px rgba(255, 255, 255, .35); /* лёгкий «глянец» */
+    display: block;
+    shape-outside: circle(50%); /* ВАУ: текст обтекает по кругу */
+}
+
+/* Контейнер для планеты — чтобы приклеить ленту/бейдж */
+.figure-planet {
+    position: relative; /* база для абсолютных элементов */
+    /* хитрость для кросс‑браузерности shape-outside:
+       приклеим высоту контейнера к картинке, чтобы не схлопывался */
+    /* (если не нужно — можно убрать) */
+}
+
+/* Бейдж-лента на углу планеты */
+.badge {
+    position: absolute;
+    top: 12px;
+    right: -8px;
+    background: #8B0000;
+    color: #fff;
+    font: 700 12px/1 'Orbitron', sans-serif;
+    padding: 6px 10px;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+}
+
+
+.home-intro {
+    text-align: left;
+}
