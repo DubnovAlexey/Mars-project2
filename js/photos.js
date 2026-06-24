@@ -1,24 +1,24 @@
 // photos.js
 const galleryPhotos = [
     {
-        src: "https://photojournal.jpl.nasa.gov/jpeg/PIA25068.jpg",
+        src: "https://upload.wikimedia.org/wikipedia/commons/4/46/Jezero_crater_on_Mars_PIA23214.jpg",
         alt: "Dust Storm and Jezero Crater"
     },
     {
-        src: "https://photojournal.jpl.nasa.gov/jpegMod/PIA25897_modest.jpg",
-        alt: "Looking at the Crater Half Full"
+        src: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Curiosity_Selfie_at_Mount_Sharp_-_Crop.jpg",
+        alt: "Curiosity Rover Selfie"
     },
     {
-        src: "https://photojournal.jpl.nasa.gov/jpegMod/PIA25912_modest.jpg",
-        alt: "Curiosity's 'Postcard' of 'Marker Band Valley'"
+        src: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Mars_Panorama_-_Curiosity_rover.jpg",
+        alt: "Mars Landscape by Curiosity"
     },
     {
-        src: "https://science.nasa.gov/photojournal/nasas-perseverance-rover-snaps-westernmost-selfie/",
-        alt: "Curiosity Captures Mars Landscape While Talking to an Orbiter"
+        src: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Perseverance_Rover_Selfie_at_Rochette.jpg",
+        alt: "Perseverance Rover"
     },
     {
-        src: "https://photojournal.jpl.nasa.gov/jpegMod/PIA26633_modest.jpg",
-        alt: "Curiosity Views a Martian Rock Shaped Like Coral"
+        src: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
+        alt: "Mars True Color"
     },
     {
         src: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Phobos_colour_2008.jpg",
