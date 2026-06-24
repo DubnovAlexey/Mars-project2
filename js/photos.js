@@ -1,29 +1,54 @@
 // photos.js
 const galleryPhotos = [
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/4/46/Jezero_crater_on_Mars_PIA23214.jpg",
+        src: "Images/mars-2.webp",
         alt: "Dust Storm and Jezero Crater"
     },
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Curiosity_Selfie_at_Mount_Sharp_-_Crop.jpg",
+        src: "Images/mars-3.webp",
         alt: "Curiosity Rover Selfie"
     },
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Mars_Panorama_-_Curiosity_rover.jpg",
+        src: "Images/mars-4.webp",
         alt: "Mars Landscape by Curiosity"
     },
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Perseverance_Rover_Selfie_at_Rochette.jpg",
+        src: "Images/mars-5.webp",
         alt: "Perseverance Rover"
     },
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
+        src: "Images/mars-6.webp",
         alt: "Mars True Color"
     },
     {
-        src: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Phobos_colour_2008.jpg",
+        src: "Images/mars-7.jpg",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/mars-8.jpg",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/mars-9.webp",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/OSIRIS_Mars_true_color.jpg",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/istockphoto-2057625445-2048x2048.jpg",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/istockphoto-1621445968-2048x2048.jpg",
+        alt: "Phobos moon"
+    },
+    {
+        src: "Images/1976-900x506.jpg",
         alt: "Phobos moon"
     }
+
 ];
 
 function generateGallery() {
