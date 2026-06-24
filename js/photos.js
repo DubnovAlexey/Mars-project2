@@ -51,37 +51,44 @@ const galleryPhotos = [
 
 ];
 
-function generateGallery() {
-    console.log("Функция generateGallery запущена!");
-    const galleryContainer = document.querySelector('.gallery');
-    console.log("Массив фото:", galleryPhotos);
-    galleryContainer.innerHTML = ''; // Очищаем контейнер, чтобы избежать дублирования
 
-    const rowOne = document.createElement('div');
-    rowOne.className = 'row g-3';
-    const rowTwo = document.createElement('div');
-    rowTwo.className = 'row g-3 mt-2';
+// 2. ФУНКЦИЯ ГЕНЕРАЦИИ СЕТКИ
+function generateGallery() {
+    console.log("Функция generateGallery успешно запущена!");
+    const galleryContainer = document.querySelector('.gallery');
+
+    if (!galleryContainer) {
+        console.error("Контейнер .gallery не найден на странице!");
+        return;
+    }
+
+    galleryContainer.innerHTML = ''; // Очищаем контейнер
+
+    // Создаем ОДНУ общую строку для всей сетки
+    const row = document.createElement('div');
+    row.className = 'row g-3'; // Ровные отступы Bootstrap
 
     for (let i = 0; i < galleryPhotos.length; i++) {
         const photo = galleryPhotos[i];
+
         const colDiv = document.createElement('div');
-        colDiv.className = 'col-4';
+        colDiv.className = 'col-4'; // По 3 штуки в ряд (4 из 12 колонок)
+
         const img = document.createElement('img');
         img.src = photo.src;
         img.alt = photo.alt;
-        img.className = 'img-fluid';
+
+        // w-100 растянет картинку на всю ширину, object-fit-cover красиво подрежет под один размер
+        img.className = 'img-fluid w-100 object-fit-cover';
+        img.style.height = '280px'; // Фиксированная высота для идеальной симметрии
 
         colDiv.appendChild(img);
-
-        if (i < 3) {
-            rowOne.appendChild(colDiv);
-        } else {
-            rowTwo.appendChild(colDiv);
-        }
+        row.appendChild(colDiv);
     }
 
-    galleryContainer.appendChild(rowOne);
-    galleryContainer.appendChild(rowTwo);
+    galleryContainer.appendChild(row);
+    console.log("Галерея успешно отрисована!");
 }
 
+// 3. Заставляем код работать при загрузке страницы
 document.addEventListener('DOMContentLoaded', generateGallery);
