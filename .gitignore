@@ -2,3 +2,15 @@
 
 /.idea/vcs.xml
 .idea
+
+# Added 01.11.2026: keep IDE files, archives and course PDFs out of git
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+*.zip
+*.rar
+.env
