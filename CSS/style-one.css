@@ -124,7 +124,7 @@ a:hover {
     border-radius: 8px;
     font-size: 0.9rem;
     text-decoration: none;
-    z-index: 9999;
+    z-index: 1040; /* выше страницы, но ниже окон Bootstrap (1050+): не закрывает кнопки окна */
     transition: all 0.3s ease;
 }
 
@@ -423,3 +423,57 @@ a:hover {
     }
 }
 
+
+/* ======= Формы в окнах: превью вложений ======= */
+.form-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.form-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    background: #f3f3f3;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+}
+
+.form-preview img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin: 0;
+}
+
+/* ======= Подписи под фото галереи ======= */
+.gallery-figure {
+    margin: 0;
+}
+
+.gallery-caption {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #555;
+    margin-top: 0.4rem;
+    text-align: left;
+}
+
+@media (max-width: 575.98px) {
+    .gallery-caption {
+        font-size: 0.7rem;
+    }
+}
+
+/* Подпись с автором под снимком в мифах */
+.myth-caption {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    margin: -0.25rem 0 0.75rem;
+}

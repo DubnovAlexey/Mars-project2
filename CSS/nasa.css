@@ -1,0 +1,142 @@
+/* nasa.css — страницы Videos и Rover: карточки видео НАСА и свежие снимки марсохода.
+   Подключается после style-one.css и берёт его цвета: #b22222, #8B0000, Orbitron. */
+
+.nasa-intro {
+    text-align: left;
+    max-width: 900px;
+}
+
+.nasa-status {
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0.5rem 0 1rem;
+    text-align: left;
+}
+
+/* Сетка карточек: картинки внутри .card по умолчанию сильно увеличиваются при наведении,
+   здесь вместо этого приподнимается вся карточка */
+.nasa-grid .card img:hover,
+.nasa-grid img:hover {
+    transform: none;
+}
+
+.nasa-item {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #b22222;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: left;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.nasa-item:hover,
+.nasa-item:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    outline: none;
+}
+
+.nasa-item img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    background: #222;
+    margin: 0 0 0.75rem;
+}
+
+.nasa-item h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: #b22222;
+    font-size: 1rem;
+    line-height: 1.4;
+    margin: 0 0 0.4rem;
+}
+
+.nasa-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0 0 0.4rem;
+}
+
+.nasa-text {
+    font-size: 0.95rem;
+    margin: 0 0 0.75rem;
+}
+
+.nasa-btn {
+    margin-top: auto;
+    align-self: flex-start;
+    padding: 8px 18px;
+    background-color: #b22222;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.nasa-btn:hover {
+    background-color: #8B0000;
+    transform: translateY(-2px);
+}
+
+/* Фильтр камер марсохода */
+.nasa-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+}
+
+.nasa-filters button {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border: 2px solid #b22222;
+    border-radius: 999px;
+    background: #fff;
+    color: #b22222;
+}
+
+.nasa-filters button.active,
+.nasa-filters button:hover {
+    background: #b22222;
+    color: #fff;
+}
+
+.nasa-more {
+    margin: 1.5rem auto 0;
+    display: block;
+}
+
+/* Окно просмотра */
+.nasa-modal .modal-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #b22222;
+    font-size: 1.1rem;
+}
+
+.nasa-modal video,
+.nasa-modal .nasa-modal-img {
+    width: 100%;
+    max-height: 70vh;
+    background: #000;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.nasa-modal .modal-body {
+    text-align: left;
+}
+
+.nasa-modal .nasa-text {
+    white-space: pre-line;
+    margin-top: 0.75rem;
+}

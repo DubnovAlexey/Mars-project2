@@ -36,6 +36,8 @@
                 <li class="nav-item"><a class="nav-link" href="history.html">History</a></li>
                 <li class="nav-item"><a class="nav-link" href="myths.html">Myths</a></li>
                 <li class="nav-item"><a class="nav-link" href="photos.html">Photo</a></li>
+                <li class="nav-item"><a class="nav-link" href="videos.html">Videos</a></li>
+                <li class="nav-item"><a class="nav-link" href="rover.html">Rover</a></li>
                 <li class="nav-item"><a class="nav-link" href="about.html">About The Project</a></li>
               </ul>
             </nav>
@@ -77,19 +79,19 @@
           <div class="modal fade" id="askQuestionModal" tabindex="-1" aria-labelledby="askQuestionLabel" aria-hidden="true">
             <div class="modal-dialog"><div class="modal-content">
               <div class="modal-header"><h5 class="modal-title" id="askQuestionLabel">Ask a Question</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
-              <div class="modal-body"><form><div class="mb-3"><label for="question-name" class="form-label">Your name</label><input type="text" class="form-control" id="question-name"></div><div class="mb-3"><label for="user-question" class="form-label">Your question</label><textarea class="form-control" id="user-question" rows="5"></textarea></div></form></div>
-              <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Send</button></div>
+              <div class="modal-body"><form id="askQuestionForm" class="site-form" data-subject="Mars site: a question"><div class="mb-3"><label for="question-name" class="form-label">Your name</label><input type="text" class="form-control" id="question-name" name="name" required></div><div class="mb-3"><label for="question-email" class="form-label">Your email (for the answer)</label><input type="email" class="form-control" id="question-email" name="email" required></div><div class="mb-3"><label for="user-question" class="form-label">Your question</label><textarea class="form-control" id="user-question" name="question" rows="5" required></textarea></div><p class="form-status small mb-0" aria-live="polite"></p></form></div>
+              <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="submit" form="askQuestionForm" class="btn btn-primary">Send</button></div>
             </div></div>
           </div>
 
           <div class="modal fade" id="leaveCommentModal" tabindex="-1" aria-labelledby="leaveCommentLabel" aria-hidden="true">
-            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="leaveCommentLabel">Leave Your Comments</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form><div class="mb-3"><label for="comment-name" class="form-label">Your name</label><input type="text" class="form-control" id="comment-name"></div><div class="mb-3"><label for="user-comment" class="form-label">Your comments</label><textarea class="form-control" id="user-comment" rows="5"></textarea></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Send</button></div></div></div></div>
+            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="leaveCommentLabel">Leave Your Comments</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form id="leaveCommentForm" class="site-form" data-subject="Mars site: a comment"><div class="mb-3"><label for="comment-name" class="form-label">Your name</label><input type="text" class="form-control" id="comment-name" name="name" required></div><div class="mb-3"><label for="comment-email" class="form-label">Your email (for the answer)</label><input type="email" class="form-control" id="comment-email" name="email" required></div><div class="mb-3"><label for="user-comment" class="form-label">Your comments</label><textarea class="form-control" id="user-comment" name="comment" rows="5" required></textarea></div><div class="mb-3"><label for="comment-photo" class="form-label">Add a photo (optional)</label><input type="file" class="form-control" id="comment-photo" name="attachment" accept="image/*"><div class="form-previews"></div></div><p class="form-status small mb-0" aria-live="polite"></p></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="submit" form="leaveCommentForm" class="btn btn-primary">Send</button></div></div></div></div>
 
           <div class="modal fade" id="donateModal" tabindex="-1" aria-labelledby="donateLabel" aria-hidden="true">
-            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="donateLabel">Donate to the Mars Expedition</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form><div class="mb-3"><label for="card-number" class="form-label">Card Number</label><input type="text" class="form-control" id="card-number" placeholder="0000 0000 0000 0000"></div><div class="row"><div class="col-md-6 mb-3"><label for="expiry-date" class="form-label">Expiry Date</label><input type="text" class="form-control" id="expiry-date" placeholder="MM/YY"></div><div class="col-md-6 mb-3"><label for="cvv-code" class="form-label">CVV Code</label><input type="text" class="form-control" id="cvv-code" placeholder="123"></div></div><div class="mb-3"><label for="cardholder-name" class="form-label">Cardholder Name</label><input type="text" class="form-control" id="cardholder-name"></div><div class="mb-3"><label for="donation-amount" class="form-label">Donation Amount</label><input type="number" class="form-control" id="donation-amount" placeholder="e.g., 10"></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Send</button></div></div></div></div>
+            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="donateLabel">Donate to the Mars Expedition</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form id="donateForm" class="site-form" data-demo="true"><p class="alert alert-warning small">Demo form for a study project: card details are checked in the browser and are <b>never sent anywhere</b>. No payment is made.</p><div class="mb-3"><label for="card-number" class="form-label">Card Number</label><input type="text" class="form-control" id="card-number" placeholder="0000 0000 0000 0000" inputmode="numeric" autocomplete="off" required></div><div class="row"><div class="col-md-6 mb-3"><label for="expiry-date" class="form-label">Expiry Date</label><input type="text" class="form-control" id="expiry-date" placeholder="MM/YY" autocomplete="off" required></div><div class="col-md-6 mb-3"><label for="cvv-code" class="form-label">CVV Code</label><input type="text" class="form-control" id="cvv-code" placeholder="123" inputmode="numeric" autocomplete="off" required></div></div><div class="mb-3"><label for="cardholder-name" class="form-label">Cardholder Name</label><input type="text" class="form-control" id="cardholder-name" autocomplete="off" required></div><div class="mb-3"><label for="donation-amount" class="form-label">Donation Amount</label><input type="number" class="form-control" id="donation-amount" placeholder="e.g., 10" min="1" required></div><p class="form-status small mb-0" aria-live="polite"></p></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="submit" form="donateForm" class="btn btn-primary">Send</button></div></div></div></div>
 
           <div class="modal fade" id="sendMaterialsModal" tabindex="-1" aria-labelledby="sendMaterialsLabel" aria-hidden="true">
-            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="sendMaterialsLabel">Send Materials</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form><div class="mb-3"><label for="materials-name" class="form-label">Your name</label><input type="text" class="form-control" id="materials-name"></div><div class="mb-3"><label for="materials-info" class="form-label">Materials description</label><textarea class="form-control" id="materials-info" rows="5"></textarea></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Send</button></div></div></div></div>
+            <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="sendMaterialsLabel">Send Materials</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><form id="sendMaterialsForm" class="site-form" data-subject="Mars site: materials"><div class="mb-3"><label for="materials-name" class="form-label">Your name</label><input type="text" class="form-control" id="materials-name" name="name" required></div><div class="mb-3"><label for="materials-email" class="form-label">Your email (for the answer)</label><input type="email" class="form-control" id="materials-email" name="email" required></div><div class="mb-3"><label for="materials-info" class="form-label">Materials description</label><textarea class="form-control" id="materials-info" name="description" rows="5" required></textarea></div><div class="mb-3"><label for="materials-files" class="form-label">Files: photos, documents, video (optional, up to 5 files, 10 MB in total)</label><input type="file" class="form-control" id="materials-files" name="attachment" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt,.zip"><div class="form-previews"></div></div><p class="form-status small mb-0" aria-live="polite"></p></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="submit" form="sendMaterialsForm" class="btn btn-primary">Send</button></div></div></div></div>
 
         </div>
       `;
@@ -242,13 +244,30 @@
 
             // --- ИСПРАВЛЕНО: Авто воспроизведение и обработка Promise ---
             if (wasPlaying) {
-                audioEl.play().then(updateToggleText).catch(err => {
-                    // Autoplay may be blocked -> user must press Play.
-                    console.warn("Autoplay prevented:", err);
-                    // Очищаем флаг, чтобы не пытаться снова:
-                    localStorage.setItem("siteAudioPlaying", "false");
+                // Продолжаем трек с того места, где он играл на прошлой странице
+                const savedTime = parseFloat(localStorage.getItem("siteAudioTime"));
+                localStorage.removeItem("siteAudioTime");
+                const startPlayback = () => audioEl.play().then(updateToggleText).catch(() => {
+                    // Браузер не дал включить звук без жеста — включаем при первом щелчке или клавише
+                    const resume = (ev) => {
+                        removeResume();
+                        if (ev.target.closest && ev.target.closest(".site-audio-controls")) return; // кнопки плеера работают сами
+                        if (!audioEl.paused) return;
+                        audioEl.play().then(updateToggleText).catch(updateToggleText);
+                    };
+                    const removeResume = () => ["pointerdown", "keydown"].forEach(t => document.removeEventListener(t, resume, true));
+                    ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, resume, true));
                     updateToggleText();
                 });
+                if (savedTime > 0) {
+                    // Сначала перематываем, потом включаем — иначе трек на секунду начинается сначала
+                    audioEl.addEventListener("loadedmetadata", () => {
+                        if (savedTime < audioEl.duration) audioEl.currentTime = savedTime;
+                        startPlayback();
+                    }, {once: true});
+                } else {
+                    startPlayback();
+                }
             }
             // -----------------------------------------------------------
 
@@ -327,6 +346,20 @@
                 }
                 // navigation proceeds normally
             });
+        });
+
+        // Уходим со страницы во время музыки (меню, подвал, «назад») — запоминаем трек и место,
+        // чтобы следующая страница продолжила его. Если музыка на паузе, страницы по-прежнему
+        // начинают каждая со своего трека.
+        window.addEventListener("pagehide", () => {
+            if (audioEl.paused) return;
+            try {
+                localStorage.setItem("siteAudioPlaylistId", playlistId);
+                localStorage.setItem("siteAudioIndex", String(currentIndex));
+                localStorage.setItem("siteAudioTime", String(audioEl.currentTime));
+                localStorage.setItem("siteAudioPlaying", "true");
+            } catch (e) {
+            }
         });
 
         // done

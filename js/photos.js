@@ -2,51 +2,51 @@
 const galleryPhotos = [
     {
         src: "Images/mars-2.webp",
-        alt: "Dust Storm and Jezero Crater"
+        alt: "A colourful layered crater wall, seen from orbit"
     },
     {
         src: "Images/mars-3.webp",
-        alt: "Curiosity Rover Selfie"
+        alt: "Layered, wind-carved ground, seen from orbit"
     },
     {
         src: "Images/mars-4.webp",
-        alt: "Mars Landscape by Curiosity"
+        alt: "Sand dunes with patches of frost"
     },
     {
         src: "Images/mars-5.webp",
-        alt: "Perseverance Rover"
+        alt: "Steep slopes with dark and bright streaks, seen from orbit"
     },
     {
         src: "Images/mars-6.webp",
-        alt: "Mars True Color"
+        alt: "Dark spots on seasonal ice as it thaws in spring"
     },
     {
         src: "Images/mars-7.jpg",
-        alt: "Phobos moon"
+        alt: "Artist's view: ancient Mars with lakes"
     },
     {
         src: "Images/mars-8.jpg",
-        alt: "Phobos moon"
+        alt: "Artist's view: water on ancient Mars at sunrise"
     },
     {
         src: "Images/mars-9.webp",
-        alt: "Phobos moon"
+        alt: "Dunes meeting layered ice deposits"
     },
     {
         src: "Images/OSIRIS_Mars_true_color.webp",
-        alt: "Phobos moon"
+        alt: "Mars in true colour, photographed by the OSIRIS camera of ESA's Rosetta probe"
     },
     {
         src: "Images/istockphoto-2057625445-2048x2048.jpg",
-        alt: "Phobos moon"
+        alt: "Illustration: Mars rising above Earth (stock image)"
     },
     {
         src: "Images/istockphoto-1621445968-2048x2048.jpg",
-        alt: "Phobos moon"
+        alt: "Illustration: an astronaut walking on Mars (stock image)"
     },
     {
         src: "Images/1976-900x506.jpg",
-        alt: "Phobos moon"
+        alt: "Artist's view: a rocky shore on a wetter, ancient Mars"
     }
 
 ];
@@ -82,7 +82,16 @@ function generateGallery() {
         img.className = 'img-fluid w-100 object-fit-cover';
         img.style.height = '280px'; // Фиксированная высота для идеальной симметрии
 
-        colDiv.appendChild(img);
+        // Подпись под фото — тот же текст, что в alt, чтобы было видно, что на снимке
+        const figure = document.createElement('figure');
+        figure.className = 'gallery-figure';
+        figure.appendChild(img);
+        const caption = document.createElement('figcaption');
+        caption.className = 'gallery-caption';
+        caption.textContent = photo.alt;
+        figure.appendChild(caption);
+
+        colDiv.appendChild(figure);
         row.appendChild(colDiv);
     }
 

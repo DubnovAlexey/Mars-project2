@@ -21,7 +21,8 @@ const mythsData = [
             {
                 type: "image",
                 src: "./Images/Поверхность%20Марса%20со%20следами%20Curiosity.jpg",
-                alt: "Поверхность Марса со следами Curiosity. Изображение: NASA / JPL‑Caltech / MSSS"
+                alt: "Поверхность Марса со следами Curiosity. Изображение: NASA / JPL‑Caltech / MSSS",
+                caption: "Поверхность Марса со следами Curiosity. Изображение: NASA / JPL‑Caltech / MSSS"
             },
             {
                 type: "text",
@@ -124,6 +125,12 @@ const mythsData = [
                 value: "Даже при рекордном сближении Земли и Красной планеты последняя смотрится просто как яркая точка, которую уж никак нельзя спутать с Луной."
             },
             {
+                type: "image",
+                src: "./Images/Марс%20и%20Луна,%20снимок%202005%20года..jpg",
+                alt: "Марс и Луна, снимок 2005 года",
+                caption: "Марс и Луна, снимок 2005 года. Изображение: Amirber / Wikimedia Commons"
+            },
+            {
                 type: "text",
                 value: "И да, упоминаемая в этой байке информация о том, что Красная планета и Земля сближаются только раз в 60 000 лет, тоже неправда. В реальности противостояние планет случается каждые два года."
             }
@@ -145,6 +152,12 @@ const mythsData = [
             {
                 type: "text",
                 value: "Правда, когда космические корабли Mars Global Surveyor, Mars Reconnaissance Orbiter и Mars Express сделали новые снимки Кидонии, стало совершенно очевидно, что никакого лица там нет."
+            },
+            {
+                type: "image",
+                src: "./Images/Лицо%20на%20Марсе%20в%20лучшем%20качестве.jpg",
+                alt: "Лицо на Марсе в лучшем качестве",
+                caption: "Лицо на Марсе в лучшем качестве. Изображение: NASA / JPL / University of Arizona"
             },
             {
                 type: "text",
@@ -177,6 +190,12 @@ const mythsData = [
             {
                 type: "text",
                 value: "А потом все благополучно умерли. Поэтому‑де на Марсе высокий уровень радиации и повсюду кратеры — воронки от атомных взрывов."
+            },
+            {
+                type: "image",
+                src: "./Images/Изображение%20системы%20каньонов%20долины%20Маринер%20на%20Марсе.jpg",
+                alt: "Система каньонов долины Маринер на Марсе",
+                caption: "Изображение системы каньонов долины Маринер на Марсе. Изображение: NASA / JPL‑Caltech"
             },
             {
                 type: "text",
@@ -256,6 +275,24 @@ const mythsData = [
             {type: "video", src: "https://www.youtube.com/embed/xzyOdH6OlV0?si=4I3OyibYJD50hDEs"}
         ],
         linkHref: "https://canadiangeographic.ca/articles/now-you-can-virtually-explore-mars-on-earth-in-google-street-view/"
+    },
+    {
+        title: "Миф 10. Марсиане вот-вот нападут на Землю",
+        content: [
+            {
+                type: "text",
+                value: "Со времён «Войны миров» Уэллса марсиане в книгах и кино только и делают, что летят нас завоёвывать. Веселее всех это показал Тим Бёртон в комедии «Марс атакует!» (1996), снятой по скандальным коллекционным карточкам Topps 1962 года: большеголовые пришельцы громят Вашингтон, Лас-Вегас и всё, что попадётся под луч, а армия бессильна."
+            },
+            {
+                type: "text",
+                value: "Спасает Землю не ракета и не генерал, а старая песня — «Indian Love Call» кантри-певца Слима Уитмена. От его йодля у марсиан лопаются головы. Именно поэтому на нашем сайте марсиане, заслушавшиеся фоновой музыкой, иногда… ну, вы уже видели."
+            },
+            {
+                type: "text",
+                value: "А в реальности марсиан пока не нашёл ни один марсоход: Curiosity и Perseverance ищут следы микробов, живших миллиарды лет назад. Так что громкость можно не убавлять — нашествие откладывается."
+            }
+        ],
+        linkHref: "https://en.wikipedia.org/wiki/Mars_Attacks!"
     }
 ];
 
@@ -295,6 +332,13 @@ function generateMyths() {
                 img.alt = contentItem.alt;
                 img.className = 'img-fluid my-2';
                 p.appendChild(img);
+                // Подпись с автором снимка (перенесена из первой версии проекта)
+                if (contentItem.caption) {
+                    const caption = document.createElement('span');
+                    caption.className = 'myth-caption';
+                    caption.textContent = contentItem.caption;
+                    p.appendChild(caption);
+                }
             } else if (contentItem.type === 'video') {
                 const videoContainer = document.createElement('div');
                 videoContainer.className = 'video-container video-expand';
