@@ -33,7 +33,7 @@ const galleryPhotos = [
         alt: "Phobos moon"
     },
     {
-        src: "Images/OSIRIS_Mars_true_color.jpg",
+        src: "Images/OSIRIS_Mars_true_color.webp",
         alt: "Phobos moon"
     },
     {

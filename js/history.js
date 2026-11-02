@@ -174,7 +174,11 @@ function generateHistoryContent() {
                 tbody.appendChild(tr);
             });
             table.appendChild(tbody);
-            article.appendChild(table);
+            // Обёртка с горизонтальной прокруткой: на телефоне широкая таблица не растягивает страницу
+            const tableWrap = document.createElement('div');
+            tableWrap.className = 'table-responsive';
+            tableWrap.appendChild(table);
+            article.appendChild(tableWrap);
         }
 
         if (item.video) {

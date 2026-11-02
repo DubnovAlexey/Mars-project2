@@ -174,7 +174,7 @@ a:hover {
     margin: 0;
     padding: 0;
     gap: 0.5rem;
-    flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+    flex-wrap: wrap; /* на узком экране кнопки переносятся на новую строку, а не вылезают за экран */
 }
 
 .site-nav li.nav-item {
@@ -401,22 +401,25 @@ a:hover {
     display: flex; /* Активируем Flexbox для центрирования */
     justify-content: center; /* Центрируем по горизонтали */
     align-items: center; /* Центрируем по вертикали */
-    height: 350px; /* Задаем фиксированную высоту */
     max-width: 750px; /* Задаем максимальную ширину */
     margin: 20px auto; /* Центрируем сам контейнер по горизонтали */
 }
 
 /* Стили для iframe внутри контейнера */
 .figure-wrap iframe {
-    width: 700px; /* Устанавливаем ширину видео */
-    height: 350px; /* Устанавливаем высоту видео */
+    width: 100%; /* на телефоне видео сжимается по ширине экрана */
+    max-width: 700px; /* на компьютере — прежние 700px */
+    aspect-ratio: 2 / 1; /* прежняя пропорция 700 x 350 */
+    height: auto;
     border: none;
 }
 
 
-/* Эффект при наведении мыши теперь применяется к самому видео */
-.figure-wrap:hover iframe {
-    transform: scale(1.25);
-    z-index: 10;
+/* Эффект при наведении мыши — только на больших экранах с мышью, на телефоне он вылезал бы за край */
+@media (hover: hover) and (min-width: 900px) {
+    .figure-wrap:hover iframe {
+        transform: scale(1.25);
+        z-index: 10;
+    }
 }
 

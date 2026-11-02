@@ -31,7 +31,7 @@
             <h1 id="site-brand" class="brand">MIFI Project</h1>
 
             <nav class="site-nav" aria-label="Main Navigation">
-              <ul class="nav justify-content-center flex-nowrap">
+              <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="history.html">History</a></li>
                 <li class="nav-item"><a class="nav-link" href="myths.html">Myths</a></li>
@@ -42,13 +42,13 @@
 
             <p class="tagline">From early flybys to modern rovers</p>
 
-            <div class="site-audio-controls" aria-hidden="false" style="margin-top:0.5rem; display:flex; gap:.5rem; align-items:center; justify-content:center;">
+            <div class="site-audio-controls" aria-hidden="false" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:center;">
               <button id="site-audio-prev" class="btn btn-sm btn-light" type="button">⏮</button>
               <button id="site-audio-toggle" class="btn btn-sm btn-light" type="button">Play</button>
               <button id="site-audio-next" class="btn btn-sm btn-light" type="button">⏭</button>
               <span id="site-audio-title" style="min-width:160px;display:inline-block;color:#fff;text-align:center;font-size:.9rem;"></span>
               <label for="site-audio-vol" style="color:#fff;margin-left:4px;font-size:.85rem;">Vol</label>
-              <input id="site-audio-vol" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;">
+              <input id="site-audio-vol" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px; max-width:30vw;">
               <audio id="site-audio" preload="auto" crossorigin="anonymous"></audio>
             </div>
           </header>
@@ -63,7 +63,7 @@
         <div id="site-footer-container">
           <footer>
             <nav class="site-nav" aria-label="Footer Navigation">
-              <ul class="nav justify-content-center flex-nowrap">
+              <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#askQuestionModal">Ask questions</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#leaveCommentModal">leave your comments</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#donateModal">Donate to the Mars Expedition</a></li>
@@ -122,11 +122,11 @@
         // ---------------------- Playlist selection logic ----------------------
 // choose playlist for page: page playlist -> globalPlaylist -> fallback default
         const defaultPlaylist = [
-            {src: "/music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "/music/11.mp3", title: "Red Plains (11)"},
-            {src: "/music/777.mp3", title: "Orbit Echo (777)"},
-            {src: "/music/888.mp3", title: "Dust Trail (888)"},
-            {src: "/music/999.mp3", title: "Night Crater (999)"}
+            {src: "music/33.mp3", title: "Mars Breeze (33)"},
+            {src: "music/11.mp3", title: "Red Plains (11)"},
+            {src: "music/777.mp3", title: "Orbit Echo (777)"},
+            {src: "music/888.mp3", title: "Dust Trail (888)"},
+            {src: "music/999.mp3", title: "Night Crater (999)"}
         ]
 
 
