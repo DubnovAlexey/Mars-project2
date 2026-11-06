@@ -106,9 +106,11 @@
             const href = link.getAttribute("href");
             if (href && href.split("/").pop() === currentFile) {
                 link.classList.add("active");
+                link.setAttribute("aria-current", "page");
                 matchedLabel = link.textContent.trim();
             } else {
                 link.classList.remove("active");
+                link.removeAttribute("aria-current");
             }
         });
 
