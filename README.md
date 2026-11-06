@@ -19,6 +19,8 @@ A seven-page site about Mars: its history of exploration from early flybys to mo
 - **Martians, a black-humour easter egg** in the spirit of Tim Burton's *Mars Attacks!* (my own SVG drawing, not taken from the film): with the music off they peek out of the screen edges and hide; once the music plays they dance, and their heads pop into pink brain splashes and green goo that melt away. They never block clicks and stay away for visitors who prefer reduced motion. Myth 10 tells the story of the film.
 - Responsive: on a phone the menu and the player wrap to new lines, videos and tables fit the screen.
 
+Form submissions use FormSubmit. A browser frame loading does not prove that an email was delivered, so submitted fields remain available while delivery is unconfirmed.
+
 ## Music
 
 In the player the tracks have Martian names. The real tracks are:

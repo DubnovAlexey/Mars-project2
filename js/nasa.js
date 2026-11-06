@@ -47,13 +47,14 @@ window.nasa = (function () {
     // НАСА отдаёт ссылки вида http://… с пробелами; сайт на https, поэтому меняем протокол и кодируем пробелы
     function safeUrl(url) {
         if (!url) return "";
-        let text = String(url);
         try {
-            text = encodeURI(decodeURI(text)); // decode + encode: уже закодированное не кодируется дважды
+            const parsed = new URL(String(url), location.href);
+            if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+            parsed.protocol = "https:";
+            return parsed.href;
         } catch (e) {
-            text = text.replace(/ /g, "%20");
+            return "";
         }
-        return text.replace(/^http:\/\//, "https://");
     }
 
     function formatDate(value) {

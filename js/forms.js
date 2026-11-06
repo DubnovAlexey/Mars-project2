@@ -19,20 +19,30 @@ function setFormStatus(form, text, kind) {
 }
 
 // Превью выбранных файлов: картинки — миниатюрами, остальное — именем и размером
+const previewUrls = new WeakMap();
 function showFilePreviews(input) {
     const box = input.parentElement.querySelector(".form-previews");
     if (!box) return true;
+    for (const url of previewUrls.get(input) || []) URL.revokeObjectURL(url);
+    const urls = new Set();
+    previewUrls.set(input, urls);
     box.textContent = "";
     const files = [...input.files];
     const total = files.reduce((sum, f) => sum + f.size, 0);
+    const tooMany = files.length > MAX_FILES;
+    const tooBig = total > MAX_TOTAL_BYTES;
+    input.setCustomValidity(tooMany ? `Please choose up to ${MAX_FILES} files.` : tooBig ? "The files are larger than 10 MB in total." : "");
+    if (tooMany || tooBig) { box.textContent = input.validationMessage; return false; }
     files.forEach(file => {
         const item = document.createElement("div");
         item.className = "form-preview";
         if (file.type.startsWith("image/")) {
             const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
+            const url = URL.createObjectURL(file);
+            urls.add(url);
+            img.src = url;
             img.alt = file.name;
-            img.onload = () => URL.revokeObjectURL(img.src);
+            img.onload = img.onerror = () => { URL.revokeObjectURL(url); urls.delete(url); };
             item.appendChild(img);
         }
         const name = document.createElement("span");
@@ -40,10 +50,7 @@ function showFilePreviews(input) {
         item.appendChild(name);
         box.appendChild(item);
     });
-    const tooMany = files.length > MAX_FILES;
-    const tooBig = total > MAX_TOTAL_BYTES;
-    input.setCustomValidity(tooMany ? `Please choose up to ${MAX_FILES} files.` : tooBig ? "The files are larger than 10 MB in total." : "");
-    return !tooMany && !tooBig;
+    return true;
 }
 
 // Проверки демо-формы карты: алгоритм Луна, срок MM/YY не в прошлом, CVV из 3–4 цифр
@@ -93,6 +100,21 @@ function sendForm(form) {
         frame.hidden = true;
         document.body.appendChild(frame);
     }
+    if (frame.dataset.pending === 'true') {
+        setFormStatus(form, 'Another message is still being submitted. Please wait.', 'error');
+        return;
+    }
+    frame.dataset.pending = 'true';
+    const submitButton = form.querySelector('[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
+    let timeout = null;
+    const finish = text => {
+        clearTimeout(timeout);
+        frame.onload = null;
+        frame.dataset.pending = 'false';
+        if (submitButton) submitButton.disabled = false;
+        setFormStatus(form, text);
+    };
     const extras = {
         _subject: form.dataset.subject || "Mars site",
         _template: "table",
@@ -112,12 +134,12 @@ function sendForm(form) {
     form.enctype = "multipart/form-data";
     form.target = frame.name;
     frame.onload = () => {
-        frame.onload = null;
-        setFormStatus(form, "Thank you! Your message has been sent.", "ok");
-        form.reset();
-        form.querySelectorAll(".form-previews").forEach(b => b.textContent = "");
-        closeModalSoon(form);
+        // Первичная загрузка пустого iframe ещё не является ответом сервиса.
+        try { if (frame.contentWindow.location.href === 'about:blank') return; } catch (_) { /* Внешний ответ недоступен по same-origin policy. */ }
+        // load не доказывает доставку письма: сохраняем заполненные поля и вложения.
+        finish('Your browser submitted the form. Delivery has not been confirmed; keep a copy of your message.');
     };
+    timeout = setTimeout(() => finish('Delivery could not be confirmed. Your fields are preserved; please try again later.'), 30000);
     form.submit(); // submit() не вызывает обработчик submit — повторной отправки не будет
     added.forEach(input => input.remove());
 }

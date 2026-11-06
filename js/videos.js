@@ -90,8 +90,10 @@ function createVideoCard(video) {
 
 // 4. Окно с видео: файлы ролика лежат в collection.json, выбираем средний размер
 let videoModal = null;
+let videoRequest = 0;
 
 async function openVideo(video) {
+    const request = ++videoRequest;
     const player = document.getElementById("nasaVideoPlayer");
     document.getElementById("nasaVideoTitle").textContent = video.info.title;
     document.getElementById("nasaVideoMeta").textContent =
@@ -105,6 +107,7 @@ async function openVideo(video) {
     try {
         // Список файлов ролика берём через /asset/{nasa_id}: collection.json лежит на сервере без CORS
         const asset = await nasa.getJson("https://images-api.nasa.gov/asset/" + encodeURIComponent(video.info.nasa_id));
+        if (request !== videoRequest) return;
         const files = ((asset.collection && asset.collection.items) || []).map(item => item.href);
         const pick = (suffix) => files.find(f => f.endsWith(suffix));
         const src = pick("~medium.mp4") || pick("~mobile.mp4") || pick("~large.mp4") || pick("~orig.mp4") || files.find(f => f.endsWith(".mp4"));
@@ -114,6 +117,7 @@ async function openVideo(video) {
             // автозапуск не разрешён — посетитель нажмёт ▶ на самом плеере
         });
     } catch (e) {
+        if (request !== videoRequest) return;
         document.getElementById("nasaVideoText").textContent =
             "This video cannot be loaded right now. Try again later or open it in the NASA library: https://images.nasa.gov";
     }
@@ -125,7 +129,14 @@ async function generateVideosPage() {
     const modalEl = document.getElementById("nasaVideoModal");
     videoModal = bootstrap.Modal.getOrCreateInstance(modalEl);
     nasa.pauseMusicWhileOpen(modalEl);
-    modalEl.addEventListener("hidden.bs.modal", () => document.getElementById("nasaVideoPlayer").pause());
+    modalEl.addEventListener("hide.bs.modal", () => {
+        // Ответ старого запроса не запускает ролик после закрытия окна или выбора другого.
+        videoRequest++;
+        const player = document.getElementById("nasaVideoPlayer");
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+    });
 
     // Все разделы ищутся сразу, а выводятся по порядку: видео, уже показанное выше, не повторяется ниже
     const shown = new Set();

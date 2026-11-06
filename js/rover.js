@@ -28,6 +28,7 @@ const ROVER_CACHE_MS = 60 * 60 * 1000; // лента обновляется, к�
 let currentCamera = roverCameras[0];
 let currentPage = 0;
 let photoModal = null;
+let roverRequest = 0;
 
 function instrumentName(id) {
     if (instrumentNames[id]) return instrumentNames[id];
@@ -79,6 +80,7 @@ function openPhoto(photo) {
 
 // 5. Показ ленты: первая страница заменяет снимки, «Show more» добавляет следующие
 async function showPhotos(append) {
+    const request = ++roverRequest;
     const grid = document.getElementById("rover-grid");
     const status = document.getElementById("rover-status");
     const more = document.getElementById("rover-more");
@@ -92,8 +94,8 @@ async function showPhotos(append) {
 
     try {
         const data = await loadRoverPhotos(camera, currentPage);
-        if (camera !== currentCamera) return; // пока грузили, выбрали другую камеру
-        const photos = (data.images || []).filter(p => p.image_files && (p.image_files.medium || p.image_files.small));
+        if (request !== roverRequest || camera !== currentCamera) return; // пока грузили, выбрали другую камеру
+        const photos = (Array.isArray(data.images) ? data.images : []).filter(p => p && p.camera && p.image_files && (p.image_files.medium || p.image_files.small));
         photos.forEach(p => grid.appendChild(createPhotoCard(p)));
         if (!grid.children.length) {
             status.textContent = "No photos from this camera yet.";
@@ -105,7 +107,7 @@ async function showPhotos(append) {
         currentPage += 1;
         more.hidden = currentPage * PHOTOS_PER_PAGE >= Number(data.total_results || 0);
     } catch (e) {
-        if (camera !== currentCamera) return;
+        if (request !== roverRequest || camera !== currentCamera) return;
         status.textContent = "The NASA photo feed is not answering. Please try again later.";
     }
 }
