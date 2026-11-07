@@ -59,14 +59,10 @@ function generateIndexContent() {
         mainContainer.appendChild(p);
     });
 
-    // Курсивом — пасхалка в духе «Марс атакует!»: марсиане на сайте не выносят нашу музыку
+    // Курсивом — подсказка к пасхалке: марсиане на сайте не выносят нашу музыку
     const note = document.createElement('p');
     const em = document.createElement('em');
-    em.append('P.S. Turn the music on and keep an eye on the corners of the screen. If a martian’s head pops, blame the music — in Tim Burton’s ');
-    const film = document.createElement('a');
-    film.href = 'myths.html';
-    film.textContent = 'Mars Attacks!';
-    em.append(film, ' an old country song saved the Earth the same way.');
+    em.textContent = 'P.S. Martians have been spotted at the edges of this site. The only weapon known to work against them is Earth music — so the player above is not just for atmosphere.';
     note.appendChild(em);
     mainContainer.appendChild(note);
 }

@@ -126,12 +126,47 @@
         // ---------------------- Playlist selection logic ----------------------
 // choose playlist for page: page playlist -> globalPlaylist -> fallback default
         const defaultPlaylist = [
-            {src: "music/33.mp3", title: "Mars Breeze (33)"},
-            {src: "music/11.mp3", title: "Red Plains (11)"},
-            {src: "music/777.mp3", title: "Orbit Echo (777)"},
-            {src: "music/888.mp3", title: "Dust Trail (888)"},
-            {src: "music/999.mp3", title: "Night Crater (999)"}
-        ]
+            {
+                "src": "music/33.mp3",
+                "title": "Mars Breeze (33)"
+            },
+            {
+                "src": "music/11.mp3",
+                "title": "Red Plains (11)"
+            },
+            {
+                "src": "music/777.mp3",
+                "title": "Orbit Echo (777)"
+            },
+            {
+                "src": "music/888.mp3",
+                "title": "Dust Trail (888)"
+            },
+            {
+                "src": "music/999.mp3",
+                "title": "Night Crater (999)"
+            },
+            {
+                "src": "music/12.mp3",
+                "title": "12"
+            },
+            {
+                "src": "music/1-Мачете-Крайний-Край-MYH132.mp3",
+                "title": "1-Мачете-Крайний-Край-MYH132"
+            },
+            {
+                "src": "music/Anja Schneider - I Care For You.mp3",
+                "title": "Anja Schneider - I Care For You"
+            },
+            {
+                "src": "music/Home - Eva Poklonskaya.mp3",
+                "title": "Home - Eva Poklonskaya"
+            },
+            {
+                "src": "music/I Feel Like I m Drowning   Two Feet.mp3",
+                "title": "I Feel Like I m Drowning   Two Feet"
+            }
+        ];
 
 
         function getPlaylistFor(file) {
@@ -175,6 +210,39 @@
         const nextBtn = document.getElementById("site-audio-next");
         const volRange = document.getElementById("site-audio-vol");
         const titleEl = document.getElementById("site-audio-title");
+        let trackVersion = 0;
+        let playbackRequested = false;
+        let userAudioAction = false;
+        let failedTrackCount = 0;
+        let errorAdvanceTimer = null;
+        let resumeAfterPageShow = false;
+
+        // НАЧАЛО ФУНКЦИИ savePlaybackState
+        function savePlaybackState() {
+            saveState();
+            try {
+                localStorage.setItem("siteAudioTime", String(audioEl.currentTime));
+                localStorage.setItem("siteAudioPlaying", String(!audioEl.paused));
+            } catch (e) {}
+        }
+        // КОНЕЦ ФУНКЦИИ savePlaybackState
+
+        // НАЧАЛО ФУНКЦИИ playCurrentTrack
+        function playCurrentTrack() {
+            const version = trackVersion;
+            playbackRequested = true;
+            let attempt;
+            try { attempt = audioEl.play(); }
+            catch (error) { return Promise.reject(error); }
+            return Promise.resolve(attempt).then(() => {
+                if (version !== trackVersion) return;
+                if (!playbackRequested) { audioEl.pause(); return; }
+                savePlaybackState();
+                updateToggleText();
+            });
+        }
+        // КОНЕЦ ФУНКЦИИ playCurrentTrack
+
 
         function saveState() {
             try {
@@ -185,6 +253,9 @@
         }
 
         function setTrack(index) {
+            trackVersion++;
+            clearTimeout(errorAdvanceTimer);
+            errorAdvanceTimer = null;
             if (!playlist || playlist.length === 0) {
                 audioEl.removeAttribute("src");
                 titleEl.textContent = "";
@@ -193,7 +264,7 @@
             currentIndex = ((index % playlist.length) + playlist.length) % playlist.length;
             const item = playlist[currentIndex];
             titleEl.textContent = item.title || item.src.split("/").pop();
-            if (audioEl.src !== location.origin + "/" + item.src.replace(/^\.\//, "")) {
+            if (audioEl.src !== new URL(item.src, location.href).href) {
                 // set relative src (works on server). Setting attribute avoids reload if same.
                 audioEl.src = item.src;
             } else {
@@ -206,13 +277,13 @@
         function nextTrack() {
             setTrack(currentIndex + 1);
             // try to autoplay next. Promise rejection is handled correctly.
-            audioEl.play().then(() => updateToggleText()).catch(() => updateToggleText());
+            playCurrentTrack().catch(updateToggleText);
         }
 
         function prevTrack() {
             setTrack(currentIndex - 1);
             // try to autoplay next. Promise rejection is handled correctly.
-            audioEl.play().then(() => updateToggleText()).catch(() => updateToggleText());
+            playCurrentTrack().catch(updateToggleText);
         }
 
 // init volume from storage if present
@@ -240,66 +311,70 @@
 
         updateToggleText();
 
-// try resume if user wanted playback
+// Restore both position and pause intent; source generation prevents an old metadata callback
+// from seeking/starting a different track selected while the previous file was loading.
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
+            const savedTime = savedPlaylistId === playlistId ? parseFloat(localStorage.getItem("siteAudioTime")) : 0;
+            localStorage.removeItem("siteAudioTime");
+            const version = trackVersion;
+            const startPlayback = () => playCurrentTrack().catch(() => {
+                const resume = ev => {
+                    removeResume();
+                    if (ev.target.closest && ev.target.closest(".site-audio-controls")) return;
+                    if (!audioEl.paused || !playbackRequested) return;
+                    playCurrentTrack().catch(updateToggleText);
+                };
+                const removeResume = () => ["pointerdown", "keydown"].forEach(type => document.removeEventListener(type, resume, true));
+                ["pointerdown", "keydown"].forEach(type => document.addEventListener(type, resume, true));
+                updateToggleText();
+            });
+            const restore = () => {
+                if (version !== trackVersion) return;
+                if (savedTime > 0 && savedTime < audioEl.duration) audioEl.currentTime = savedTime;
+                if (wasPlaying && !userAudioAction) startPlayback();
+            };
+            if (savedTime > 0 && audioEl.readyState < 1) audioEl.addEventListener("loadedmetadata", restore, {once:true});
+            else restore();
+        } catch (e) {}
 
-            // --- ИСПРАВЛЕНО: Авто воспроизведение и обработка Promise ---
-            if (wasPlaying) {
-                // Продолжаем трек с того места, где он играл на прошлой странице
-                const savedTime = parseFloat(localStorage.getItem("siteAudioTime"));
-                localStorage.removeItem("siteAudioTime");
-                const startPlayback = () => audioEl.play().then(updateToggleText).catch(() => {
-                    // Браузер не дал включить звук без жеста — включаем при первом щелчке или клавише
-                    const resume = (ev) => {
-                        removeResume();
-                        if (ev.target.closest && ev.target.closest(".site-audio-controls")) return; // кнопки плеера работают сами
-                        if (!audioEl.paused) return;
-                        audioEl.play().then(updateToggleText).catch(updateToggleText);
-                    };
-                    const removeResume = () => ["pointerdown", "keydown"].forEach(t => document.removeEventListener(t, resume, true));
-                    ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, resume, true));
-                    updateToggleText();
-                });
-                if (savedTime > 0) {
-                    // Сначала перематываем, потом включаем — иначе трек на секунду начинается сначала
-                    audioEl.addEventListener("loadedmetadata", () => {
-                        if (savedTime < audioEl.duration) audioEl.currentTime = savedTime;
-                        startPlayback();
-                    }, {once: true});
-                } else {
-                    startPlayback();
-                }
+// audio events: the full list loops; failure traversal is bounded to one playlist pass.
+        audioEl.addEventListener("playing", () => { failedTrackCount = 0; updateToggleText(); });
+        audioEl.addEventListener("pause", updateToggleText);
+        audioEl.addEventListener("ended", () => { if (playbackRequested && audioEl.ended !== false) nextTrack(); });
+        audioEl.addEventListener("error", () => {
+            clearTimeout(errorAdvanceTimer);
+            if (!playbackRequested) return;
+            const version = trackVersion;
+            failedTrackCount++;
+            if (failedTrackCount >= playlist.length) {
+                playbackRequested = false;
+                audioEl.pause();
+                updateToggleText();
+                return;
             }
-            // -----------------------------------------------------------
-
-        } catch (e) {
-        }
-
-// audio events
-        audioEl.addEventListener("ended", nextTrack);
-        audioEl.addEventListener("error", (e) => {
-            console.warn("Audio error for", playlist[currentIndex], e);
-            // on error — try next track
-            setTimeout(nextTrack, 500);
+            errorAdvanceTimer = setTimeout(() => {
+                errorAdvanceTimer = null;
+                if (playbackRequested && version === trackVersion) nextTrack();
+            }, 500);
         });
 
 // controls
         toggleBtn.addEventListener("click", () => {
+            userAudioAction = true;
             if (audioEl.paused) {
-                audioEl.play().then(() => {
-                    try {
-                        localStorage.setItem("siteAudioPlaying", "true");
-                    } catch (e) {
-                    }
-                    updateToggleText();
-                }).catch(err => {
+                failedTrackCount = 0;
+                playCurrentTrack().catch(err => {
                     // Эта ошибка не должна возникать, так как клик — это действие пользователя,
                     // но мы ловим ее, чтобы избежать Uncaught Promise.
                     console.warn("Play failed:", err);
                 });
             } else {
+                playbackRequested = false;
+                clearTimeout(errorAdvanceTimer);
+                errorAdvanceTimer = null;
                 audioEl.pause();
+                savePlaybackState();
                 try {
                     localStorage.setItem("siteAudioPlaying", "false");
                 } catch (e) {
@@ -309,9 +384,13 @@
         });
 
         nextBtn.addEventListener("click", () => {
+            userAudioAction = true;
+            failedTrackCount = 0;
             nextTrack();
         });
         prevBtn.addEventListener("click", () => {
+            userAudioAction = true;
+            failedTrackCount = 0;
             prevTrack();
         });
 
@@ -331,38 +410,36 @@
                 if (!href) return;
                 if (href.startsWith("http") || href.startsWith("#")) return;
                 const targetFile = href.split("/").pop();
-                // compute playlist id for target page and initial index (by hash)
-                const targetPlaylist = (window.pageData && window.pageData[targetFile] && Array.isArray(window.pageData[targetFile].playlist))
-                    ? window.pageData[targetFile].playlist.slice()
-                    : (window.pageData && Array.isArray(window.pageData.globalPlaylist) ? window.pageData.globalPlaylist.slice() : defaultPlaylist.slice());
-
-                const targetId = targetPlaylist.map(p => p.src).join("|");
-                const startIndex = hashToInt(targetFile) % Math.max(1, targetPlaylist.length);
-
-                try {
-                    localStorage.setItem("siteAudioPlaylistId", targetId);
-                    localStorage.setItem("siteAudioIndex", String(startIndex));
-                    // if currently playing -> keep play flag; otherwise keep 'false'
-                    localStorage.setItem("siteAudioPlaying", (!audioEl.paused).toString());
-                } catch (e) {
+                const targetPlaylist = getPlaylistFor(targetFile);
+                const targetId = computePlaylistId(targetPlaylist);
+                if (targetId === playlistId) {
+                    savePlaybackState();
+                } else {
+                    try {
+                        localStorage.setItem("siteAudioPlaylistId", targetId);
+                        localStorage.setItem("siteAudioIndex", String(hashToInt(targetFile) % Math.max(1, targetPlaylist.length)));
+                        localStorage.removeItem("siteAudioTime");
+                        localStorage.setItem("siteAudioPlaying", String(!audioEl.paused));
+                    } catch (e) {}
                 }
                 // navigation proceeds normally
             });
         });
 
-        // Уходим со страницы во время музыки (меню, подвал, «назад») — запоминаем трек и место,
-        // чтобы следующая страница продолжила его. Если музыка на паузе, страницы по-прежнему
-        // начинают каждая со своего трека.
+        // НАЧАЛО РАЗДЕЛА сохранения при навигации и BFCache
         window.addEventListener("pagehide", () => {
-            if (audioEl.paused) return;
-            try {
-                localStorage.setItem("siteAudioPlaylistId", playlistId);
-                localStorage.setItem("siteAudioIndex", String(currentIndex));
-                localStorage.setItem("siteAudioTime", String(audioEl.currentTime));
-                localStorage.setItem("siteAudioPlaying", "true");
-            } catch (e) {
-            }
+            resumeAfterPageShow = !audioEl.paused;
+            savePlaybackState();
+            trackVersion++;
+            playbackRequested = false;
+            clearTimeout(errorAdvanceTimer);
+            errorAdvanceTimer = null;
+            audioEl.pause();
         });
+        window.addEventListener("pageshow", event => {
+            if (event.persisted && resumeAfterPageShow) playCurrentTrack().catch(updateToggleText);
+        });
+        // КОНЕЦ РАЗДЕЛА сохранения при навигации и BFCache
 
         // done
     } // end run

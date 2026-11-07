@@ -1,19 +1,27 @@
-/* martians.css — мультяшные марсиане, которые слушают музыку сайта, пока у них не лопнет голова.
-   Свой рисунок (SVG в js/martians.js), не из фильмов. Не перехватывают клики (pointer-events: none). */
+/* martians.css — марсиане под стеклянными шлемами, которые слушают музыку сайта, пока у них не лопнет голова.
+   Сценарий: страшно (кровь, мозги, осколки) → смешно (тело без головы машет, глаз моргает и укатывается).
+   Свой рисунок (SVG в js/martians.js), по мотивам ретро-фантастики 50-х, без копирования персонажей фильмов.
+   Ничего не перехватывает клики (pointer-events: none).
+   Только персонажи — никаких надписей.
+   SECTIONS: 1 сцена; 2 марсианин и его состояния; 4 взрыв; 5 кляксы на стекле; 6 развязка; 7 телефоны. */
 
+/* BEGIN SECTION 1 — сцена */
 .martian-stage {
     position: fixed;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
-    z-index: 1030; /* над страницей, но под окнами Bootstrap (1050+) и кнопкой «наверх» (1040) */
+    z-index: 1030; /* над страницей, но под окнами Bootstrap (1050+) */
 }
+/* END SECTION 1 */
 
+/* BEGIN SECTION 2 — марсианин и его состояния */
 .martian {
     position: absolute;
-    width: 90px;
-    height: 110px;
-    transition: transform 0.6s cubic-bezier(.2, .9, .3, 1.3);
+    width: 100px;
+    height: 132px;
+    transition: transform 0.55s cubic-bezier(.2, .9, .3, 1.35);
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .55));
 }
 
 .martian svg {
@@ -22,128 +30,252 @@
     overflow: visible;
 }
 
-/* Марсианин качается в такт */
 .martian .martian-body {
     transform-origin: 50% 100%;
-    animation: martian-groove 0.48s ease-in-out infinite alternate;
+    animation: martian-groove 0.42s ease-in-out infinite alternate;
 }
 
 @keyframes martian-groove {
-    from { transform: rotate(-7deg) translateY(0); }
-    to { transform: rotate(7deg) translateY(-4px); }
+    from { transform: rotate(-8deg) translateY(0); }
+    to { transform: rotate(8deg) translateY(-5px); }
 }
 
-/* Без музыки — медленно и осторожно оглядывается */
-.martian.quiet .martian-body {
-    animation: martian-look 1.4s ease-in-out infinite alternate;
-}
+/* Без музыки — медленно и подозрительно оглядывается */
+.martian.quiet .martian-body { animation: martian-look 1.4s ease-in-out infinite alternate; }
 
 @keyframes martian-look {
     from { transform: rotate(-4deg); }
     to { transform: rotate(4deg); }
 }
 
-/* Голова раздувается от музыки */
+.martian .martian-eye { transform-box: fill-box; transform-origin: 50% 50%; }
+.martian .martian-veins { opacity: 0; }
+.martian .martian-crack { opacity: 0; }
+.martian .martian-zap { opacity: 0; }
+.martian .martian-light { animation: martian-light 0.6s steps(2, end) infinite; }
+.martian .martian-neck-stump { opacity: 0; }
+
+@keyframes martian-light { 50% { opacity: .2; } }
+
+/* Перед взрывом: глаза дёргаются и лезут из орбит, вены наливаются, шлем трескается, бластер палит */
+.martian.frenzy .martian-body { animation-duration: 0.16s; }
+.martian.frenzy .martian-eye { animation: martian-eye-bulge 0.22s ease-in-out infinite alternate; }
+.martian.frenzy .martian-veins { animation: martian-veins 0.3s ease-in-out infinite alternate; }
+.martian.frenzy .martian-crack { opacity: 1; transition: opacity .2s ease .5s; }
+.martian.frenzy .martian-zap { animation: martian-zap 0.35s steps(2, end) infinite; }
+
+@keyframes martian-eye-bulge {
+    from { transform: scale(1.05) translate(-.6px, 0); }
+    to { transform: scale(1.35) translate(.6px, -.4px); }
+}
+
+@keyframes martian-veins {
+    from { opacity: .35; }
+    to { opacity: 1; }
+}
+
+@keyframes martian-zap {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Голова раздувается */
 .martian.swelling .martian-head {
     transform-box: fill-box;
-    transform-origin: 50% 80%;
-    animation: martian-swell 1.6s ease-in forwards;
+    transform-origin: 50% 85%;
+    animation: martian-swell 1.5s cubic-bezier(.5, 0, .9, .6) forwards;
 }
 
 @keyframes martian-swell {
     0% { transform: scale(1); }
-    60% { transform: scale(1.35, 1.25); }
-    80% { transform: scale(1.3, 1.45); }
-    100% { transform: scale(1.75); }
+    55% { transform: scale(1.3, 1.2); }
+    70% { transform: scale(1.22, 1.42); }
+    85% { transform: scale(1.55, 1.4); }
+    100% { transform: scale(1.85); }
 }
 
-.martian.popped .martian-head {
-    visibility: hidden;
-}
+.martian.popped .martian-head { visibility: hidden; }
+.martian.popped .martian-neck-stump { opacity: 1; }
+.martian.popped .martian-zap { animation: none; opacity: 0; }
 
-.martian.popped .martian-body {
-    animation: martian-wobble 0.25s ease-in-out 3;
-}
+.martian.popped .martian-body { animation: martian-wobble 0.22s ease-in-out 4; }
 
 @keyframes martian-wobble {
-    from { transform: rotate(-12deg); }
-    to { transform: rotate(12deg); }
+    from { transform: rotate(-14deg); }
+    to { transform: rotate(14deg); }
 }
+/* END SECTION 2 */
 
-/* Пузырь с репликой */
-.martian-bubble {
+/* BEGIN SECTION 4 — взрыв */
+.martian-burst {
     position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    background: #fff;
-    color: #8B0000;
-    border: 2px solid #8B0000;
-    border-radius: 12px;
-    padding: 2px 10px;
-    font: 0.75rem 'Orbitron', sans-serif;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 250, 220, .95) 0 12%, rgba(255, 70, 40, .75) 30%, rgba(120, 0, 0, .45) 55%, transparent 72%);
+    animation: martian-burst 0.55s ease-out forwards;
 }
 
-/* Брызги: летят, шлёпаются и тают */
-.martian-drop {
+@keyframes martian-burst {
+    from { transform: translate(-50%, -50%) scale(.2); opacity: 1; }
+    to { transform: translate(-50%, -50%) scale(2.1); opacity: 0; }
+}
+
+.martian-shard {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(235, 250, 255, .9), rgba(160, 215, 235, .35));
+    clip-path: polygon(50% 0, 100% 70%, 30% 100%, 0 40%);
+}
+
+.martian-blood {
+    position: absolute;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: inset -1px -2px 2px rgba(0, 0, 0, .35);
+}
+
+.martian-brain {
+    --brain: #e7a3b1;            /* цвет по умолчанию; js/martians.js задаёт свой каждому куску */
+    position: absolute;
+    border-radius: 46% 54% 42% 58% / 55% 45% 58% 42%;
+    background:
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, .45) 0 10%, transparent 12%),
+            repeating-radial-gradient(circle at 60% 60%, transparent 0 3px, rgba(140, 40, 70, .55) 3px 4px),
+            var(--brain);
+    box-shadow: inset -2px -3px 4px rgba(90, 0, 20, .45), 0 0 0 1px rgba(120, 0, 0, .5);
+}
+
+.martian-goo {
     position: absolute;
     border-radius: 50%;
-    opacity: 0.95;
-    transition: transform 0.7s cubic-bezier(.15, .7, .3, 1), border-radius 0.7s ease;
+    box-shadow: inset -2px -2px 3px rgba(0, 60, 0, .35);
 }
 
-.martian-drop.landed {
-    border-radius: 45% 55% 40% 60% / 55% 45% 60% 40%;
-}
-
-.martian-drop.fading {
-    transition: opacity 2.2s ease, transform 2.2s ease-in;
-    opacity: 0;
-}
-
-/* Клякса «изнутри на стекле»: прилетает из глубины, расплющивается и стекает */
-.martian-glass {
+/* Глаз: белок с кровавыми прожилками, красная радужка и зрачок */
+.martian-eyeball {
     position: absolute;
-    border-radius: 48% 52% 45% 55% / 55% 42% 58% 45%;
-    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.55) 0 8%, transparent 9%),
-    var(--splat-color);
-    opacity: 0.85;
-    box-shadow: inset -8px -10px 18px rgba(0, 0, 0, 0.25);
-    animation: martian-glass-hit 0.28s cubic-bezier(.2, 1.6, .4, 1) both;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background:
+            radial-gradient(circle at 52% 50%, #050505 0 14%, #8b0000 15% 30%, transparent 31%),
+            radial-gradient(circle at 40% 35%, #fffbe8 0 35%, #f1e3c2 60%, #d79a8a 100%);
+    box-shadow: inset 0 0 0 1px rgba(150, 0, 0, .5), 0 3px 6px rgba(0, 0, 0, .4);
 }
 
-.martian-glass::after {
+.martian-eyeball::after {
     content: "";
     position: absolute;
-    left: 42%;
-    top: 70%;
-    width: 16%;
-    height: 0;
-    background: var(--splat-color);
-    border-radius: 0 0 50% 50%;
-    animation: martian-glass-drip 2.4s ease-in 0.3s forwards;
+    inset: 0;
+    border-radius: 50%;
+    background: #b4bd8c;
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+}
+
+.martian-eyeball.blinking::after { animation: martian-blink 0.9s ease-in-out 2; }
+
+@keyframes martian-blink {
+    0%, 40%, 100% { transform: scaleY(0); }
+    55%, 65% { transform: scaleY(1); }
+}
+
+.martian-shard.fading,
+.martian-blood.fading,
+.martian-brain.fading,
+.martian-goo.fading,
+.martian-eyeball.fading {
+    transition: opacity 2.2s ease;
+    opacity: 0;
+}
+/* END SECTION 4 */
+
+/* BEGIN SECTION 5 — кляксы «изнутри на стекле» (SVG строит splatSVG в js/martians.js) */
+.martian-glass {
+    position: absolute;
+    opacity: .93;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35));
+    animation: martian-glass-hit 0.24s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+
+.martian-glass svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Подтёк растёт вниз от кляксы */
+.martian-drip {
+    --drip-time: 2.4s;           /* по умолчанию; у каждого подтёка своё значение из js/martians.js */
+    --drip-delay: .3s;
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    transform: scaleY(.04);
+    animation: martian-drip var(--drip-time) cubic-bezier(.5, 0, .8, .6) var(--drip-delay) forwards;
 }
 
 @keyframes martian-glass-hit {
-    0% { transform: scale(0.1); filter: blur(6px); opacity: 0; }
-    100% { transform: scale(1); filter: blur(0); opacity: 0.85; }
+    0% { transform: scale(.15); filter: blur(5px); opacity: 0; }
+    100% { transform: scale(1); filter: blur(0) drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); opacity: .93; }
 }
 
-@keyframes martian-glass-drip {
-    to { height: var(--drip); }
-}
+@keyframes martian-drip { to { transform: scaleY(1); } }
 
 .martian-glass.fading {
-    animation: none; /* иначе конечный кадр анимации держит opacity и клякса не тает */
+    animation: none; /* иначе конечный кадр держит opacity и клякса не тает */
     transition: opacity 1.4s ease;
     opacity: 0;
 }
+/* END SECTION 5 */
 
-@media (max-width: 575.98px) {
-    .martian {
-        width: 64px;
-        height: 78px;
-    }
+/* BEGIN SECTION 6 — развязка: тело ищет голову и машет */
+.martian.searching .martian-body { animation: martian-search 0.5s ease-in-out infinite alternate; }
+.martian.searching .martian-arm { transform-box: fill-box; transform-origin: 100% 100%; animation: martian-pat 0.3s ease-in-out infinite alternate; }
+
+@keyframes martian-search {
+    from { transform: rotate(-5deg) translateX(-3px); }
+    to { transform: rotate(5deg) translateX(3px); }
 }
+
+@keyframes martian-pat {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-35deg); }
+}
+
+.martian.waving .martian-body { animation: none; }
+.martian.waving .martian-arm--right { transform-box: fill-box; transform-origin: 0 100%; animation: martian-wave 0.25s ease-in-out infinite alternate; }
+
+@keyframes martian-wave {
+    from { transform: rotate(10deg); }
+    to { transform: rotate(-40deg); }
+}
+/* END SECTION 6 */
+
+/* BEGIN SECTION 6а — подсказка «включите музыку» */
+.martian-hint {
+    position: fixed;
+    inset-inline-end: 16px;
+    bottom: 16px;
+    z-index: 1031;
+    max-width: min(340px, calc(100vw - 32px));
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-inline-start: 3px solid #c81d1d;
+    background: rgba(12, 14, 20, .88);
+    color: #f1f1ea;
+    font: 500 .85rem/1.45 system-ui, sans-serif;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .35s ease, transform .35s ease;
+}
+
+.martian-hint.visible { opacity: 1; transform: none; }
+/* END SECTION 6а */
+
+/* BEGIN SECTION 7 — телефоны */
+@media (max-width: 575.98px) {
+    .martian { width: 70px; height: 92px; }
+}
+/* END SECTION 7 */
