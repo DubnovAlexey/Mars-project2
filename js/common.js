@@ -70,6 +70,7 @@
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#leaveCommentModal">leave your comments</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#donateModal">Donate to the Mars Expedition</a></li>
                 <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#sendMaterialsModal">Send materials</a></li>
+                <li class="nav-item"><a class="nav-link" href="https://github.com/DubnovAlexey/Mars-project2" target="_blank" rel="noopener noreferrer">Source code on GitHub</a></li>
               </ul>
             </nav>
             &copy; 2025 The Newest Martian Chronicles
@@ -119,9 +120,9 @@
         else if (window.pageData && window.pageData[currentFile] && window.pageData[currentFile].title) brandEl.textContent = window.pageData[currentFile].title;
         else brandEl.textContent = "MIFI Project";
 
-        // if data.title present -> set document.title
+        // Вкладка браузера: страница и имя сайта («Home — The Newest Martian Chronicles»), чтобы сайт узнавался среди вкладок
         if (window.pageData && window.pageData[currentFile] && window.pageData[currentFile].title) {
-            document.title = window.pageData[currentFile].title;
+            document.title = window.pageData[currentFile].title + " — The Newest Martian Chronicles";
         }
         // ---------------------- Playlist selection logic ----------------------
 // choose playlist for page: page playlist -> globalPlaylist -> fallback default
