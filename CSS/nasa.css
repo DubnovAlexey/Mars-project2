@@ -51,6 +51,36 @@
     margin: 0 0 0.75rem;
 }
 
+/* Placeholder card while the NASA feed is still answering: a dark photo frame and two text lines with a soft
+   light sweeping across (only the gradient position moves) */
+.nasa-skeleton {
+    cursor: default;
+    min-height: 0;
+}
+
+.nasa-skeleton::before,
+.nasa-skeleton::after {
+    content: "";
+    display: block;
+    border-radius: 8px;
+    background: linear-gradient(100deg, #2b2b2b 30%, #4a3a3a 50%, #2b2b2b 70%) 0 0 / 300% 100%;
+    animation: nasa-skeleton 1.6s ease-in-out infinite;
+}
+
+.nasa-skeleton::before { aspect-ratio: 16 / 10; margin-bottom: .75rem; }
+.nasa-skeleton::after { height: 2.6rem; opacity: .45; }
+
+.nasa-skeleton:hover { transform: none; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); }
+
+@keyframes nasa-skeleton {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nasa-skeleton::before, .nasa-skeleton::after { animation: none; }
+}
+
 .nasa-item h3 {
     font-family: 'Orbitron', sans-serif;
     color: #b22222;

@@ -78,24 +78,48 @@ function openPhoto(photo) {
     photoModal.show();
 }
 
-// 5. Показ ленты: первая страница заменяет снимки, «Show more» добавляет следующие
+// 5. Показ ленты: первая страница заменяет снимки, «Show more» добавляет следующие.
+// Лента НАСА иногда отвечает 10–20 секунд. Чтобы страница не стояла пустой, сразу показываются прошлые снимки:
+// из кэша этого браузера или набор, сохранённый вместе с сайтом (js/roverSnapshot.js); если их нет — заготовки
+// карточек. Свежие снимки заменяют их, как только придут.
+const usablePhotos = data => (data && Array.isArray(data.images) ? data.images : [])
+    .filter(p => p && p.camera && p.image_files && (p.image_files.medium || p.image_files.small));
+
+function showPlaceholders(grid) {
+    for (let i = 0; i < PHOTOS_PER_PAGE; i++) {
+        const col = nasa.el("div", "col-6 col-md-4 col-lg-3");
+        col.appendChild(nasa.el("div", "nasa-item nasa-skeleton"));
+        col.firstChild.setAttribute("aria-hidden", "true");
+        grid.appendChild(col);
+    }
+}
+
 async function showPhotos(append) {
     const request = ++roverRequest;
     const grid = document.getElementById("rover-grid");
     const status = document.getElementById("rover-status");
     const more = document.getElementById("rover-more");
     const camera = currentCamera;
+    let earlier = false;
     if (!append) {
         currentPage = 0;
         grid.textContent = "";
+        const saved = nasa.readStale("rover:" + camera.label + ":0") || (camera === roverCameras[0] ? window.roverSnapshot : null);
+        const savedPhotos = usablePhotos(saved);
+        earlier = savedPhotos.length > 0;
+        if (earlier) savedPhotos.forEach(p => grid.appendChild(createPhotoCard(p)));
+        else showPlaceholders(grid);
     }
     more.hidden = true;
-    status.textContent = "Loading fresh photos from NASA…";
+    status.textContent = earlier
+        ? "Showing earlier photos while fresh ones arrive from NASA…"
+        : "Loading fresh photos from NASA — the feed is slow, it can take up to 20 seconds…";
 
     try {
         const data = await loadRoverPhotos(camera, currentPage);
         if (request !== roverRequest || camera !== currentCamera) return; // пока грузили, выбрали другую камеру
-        const photos = (Array.isArray(data.images) ? data.images : []).filter(p => p && p.camera && p.image_files && (p.image_files.medium || p.image_files.small));
+        if (!append) grid.textContent = "";      // прошлые снимки или заготовки уступают место свежим
+        const photos = usablePhotos(data);
         photos.forEach(p => grid.appendChild(createPhotoCard(p)));
         if (!grid.children.length) {
             status.textContent = "No photos from this camera yet.";
@@ -108,6 +132,11 @@ async function showPhotos(append) {
         more.hidden = currentPage * PHOTOS_PER_PAGE >= Number(data.total_results || 0);
     } catch (e) {
         if (request !== roverRequest || camera !== currentCamera) return;
+        if (earlier) {
+            status.textContent = "The NASA photo feed is not answering right now — these are earlier photos.";
+            return;
+        }
+        grid.querySelectorAll(".nasa-skeleton").forEach(card => card.parentElement.remove());
         status.textContent = "The NASA photo feed is not answering. Please try again later.";
     }
 }

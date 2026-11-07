@@ -17,6 +17,16 @@ window.nasa = (function () {
         return null;
     }
 
+    // Прошлый ответ любой давности — показать, пока свежий ещё в пути
+    function readStale(key) {
+        try {
+            const saved = JSON.parse(localStorage.getItem(CACHE_PREFIX + key));
+            return saved ? saved.data : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     function writeCache(key, data) {
         try {
             localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({time: Date.now(), data}));
@@ -112,5 +122,5 @@ window.nasa = (function () {
         });
     }
 
-    return {getJson, safeUrl, formatDate, shorten, el, makeClickable, pauseMusicWhileOpen};
+    return {getJson, readStale, safeUrl, formatDate, shorten, el, makeClickable, pauseMusicWhileOpen};
 })();

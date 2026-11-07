@@ -1,12 +1,16 @@
 // js/martians.js
 // Пасхалка с чёрным юмором в стиле фантастики 1950-х: марсиане под стеклянными шлемами выглядывают из углов.
 // Сценарий «сначала страшно — потом смешно»:
-//   1. Без музыки марсиане не взрываются: появляются один за другим, остаются по краям экрана и мешают —
-//      выглядывают и прячутся. Когда их больше трёх, сайт аккуратно подсказывает включить музыку.
+//   1. Без музыки марсиане не взрываются: появляются один за другим, остаются по краям экрана, мешают и палят
+//      из бластеров. Когда их больше трёх, в центре экрана загорается тревога «включите музыку»; нажатие на неё
+//      включает музыку сайта.
 //   2. Музыка включилась — вся толпа танцует, а потом у марсиан по очереди лопаются головы: трескается шлем,
 //      летят осколки, кровь, куски мозга, слизь и глаз. Иногда всё это шлёпается «изнутри» на стекло экрана.
 //      Пока музыка играет, новые марсиане тоже появляются, танцуют и лопаются.
-//   3. Развязка: тело без головы ощупывает шею, бодро машет и уползает, глаз моргает и укатывается.
+//      Перед взрывом марсианин один-два раза палит из бластера лучом через весь экран.
+//   3. Части марсианина — глаз, зубы, палец, ухо, куски шлема и скафандра — по очереди врезаются «изнутри» в стекло
+//      экрана с кровавой кляксой и медленно сползают, размазывая кровь. Тело без головы вылезает целиком,
+//      ощупывает шею, машет, падает и только потом уползает.
 //   Музыку выключили — те, кто ещё не начал взрываться, снова просто мешают.
 // Только персонажи: никаких надписей и реплик. Рисунок свой (SVG ниже), звук генерирует браузер (Web Audio).
 // Работает на любой странице с музыкой: ищет <audio> с атрибутом data-martian-music, #site-audio или #playlistAudio.
@@ -113,10 +117,10 @@
 
     // Откуда выглядывает: снизу, слева, справа, сверху (вниз головой)
     const SPOTS = [
-        {name: "bottom", hidden: "translateY(115%)", shown: "translateY(12%)", peek: "translateY(55%)"},
-        {name: "left", hidden: "rotate(90deg) translateY(115%)", shown: "rotate(90deg) translateY(22%)", peek: "rotate(90deg) translateY(60%)"},
-        {name: "right", hidden: "rotate(-90deg) translateY(115%)", shown: "rotate(-90deg) translateY(22%)", peek: "rotate(-90deg) translateY(60%)"},
-        {name: "top", hidden: "rotate(180deg) translateY(115%)", shown: "rotate(180deg) translateY(22%)", peek: "rotate(180deg) translateY(60%)"}
+        {name: "bottom", hidden: "translateY(115%)", shown: "translateY(12%)", peek: "translateY(55%)", out: "translateY(-6%) scale(1.15)"},
+        {name: "left", hidden: "rotate(90deg) translateY(115%)", shown: "rotate(90deg) translateY(22%)", peek: "rotate(90deg) translateY(60%)", out: "rotate(90deg) translateY(-2%) scale(1.15)"},
+        {name: "right", hidden: "rotate(-90deg) translateY(115%)", shown: "rotate(-90deg) translateY(22%)", peek: "rotate(-90deg) translateY(60%)", out: "rotate(-90deg) translateY(-2%) scale(1.15)"},
+        {name: "top", hidden: "rotate(180deg) translateY(115%)", shown: "rotate(180deg) translateY(22%)", peek: "rotate(180deg) translateY(60%)", out: "rotate(180deg) translateY(-2%) scale(1.15)"}
     ];
     // END SECTION 2
 
@@ -174,20 +178,45 @@
         if (!hint) {
             hint = document.createElement("div");
             hint.className = "martian-hint";
-            hint.setAttribute("role", "status");
+            hint.setAttribute("role", "alert");   // тревога: читается экранным диктором сразу
+            hint.innerHTML = '<span class="martian-hint__sign" aria-hidden="true">⚠</span><span class="martian-hint__text"></span>';
+            hint.addEventListener("click", startMusic); // табличку можно нажать — она включает музыку сайта
             document.body.appendChild(hint);
         }
         const lang = (document.documentElement.lang || "en").slice(0, 2);
-        hint.textContent = HINT[lang] || HINT.en;
+        hint.querySelector(".martian-hint__text").textContent = HINT[lang] || HINT.en;
         hint.dir = lang === "he" ? "rtl" : "ltr";
         hint.classList.add("visible");
     }
 
+    // Нажатие на тревогу включает музыку сайта его же кнопкой (так плеер сайта знает, что играет).
+    // Кнопка: элемент с data-martian-play, иначе кнопка плеера Mars Project или «Трёх пикселей».
+    function startMusic() {
+        const m = music();
+        if (!m || !m.paused) return;
+        const control = document.querySelector("[data-martian-play]") ||
+            document.getElementById("site-audio-toggle") ||
+            document.getElementById("playlistToggle");
+        if (control) control.click();
+        else m.play().catch(() => {});
+    }
+
     // Место у края экрана подальше от уже сидящих марсиан
+    // Сверху и снизу марсиане вылезают чаще, чем сбоку, — там они сильнее мешают
+    const SPOT_WEIGHTS = {bottom: 0.38, top: 0.3, left: 0.16, right: 0.16};
+    function pickSpot() {
+        let roll = Math.random();
+        for (const spot of SPOTS) {
+            roll -= SPOT_WEIGHTS[spot.name];
+            if (roll <= 0) return spot;
+        }
+        return SPOTS[0];
+    }
+
     function freeSpot(el) {
-        let spot = pick(SPOTS);
+        let spot = pickSpot();
         for (let attempt = 0; attempt < 10; attempt++) {
-            spot = pick(SPOTS);
+            spot = pickSpot();
             placeMartian(el, spot);
             const x = parseFloat(el.style.left) || 0, y = parseFloat(el.style.top) || 0;
             const close = crowd.some(m => m.spot.name === spot.name &&
@@ -198,66 +227,165 @@
     }
     // END SECTION 3
 
-    // BEGIN SECTION 4 — взрыв: осколки шлема, кровь, мозги, слизь и глаз
-    // Каждый кусочек летит по дуге (вверх и вниз под «тяжестью») через Web Animations API,
-    // а капли крови остаются пятнами на странице и потом тают.
-    function fling(piece, x, y, spread, lift, spin, duration) {
-        const angle = rand(-Math.PI, 0) + rand(-0.5, 0.5);
-        const dx = Math.cos(angle) * rand(spread * 0.35, spread);
-        const up = -rand(lift * 0.4, lift);
-        const fall = rand(60, 220);
-        piece.style.left = x + "px";
-        piece.style.top = y + "px";
-        stage.appendChild(piece);
-        const turn = rand(-spin, spin);
-        return piece.animate([
-            {transform: "translate(-50%, -50%) scale(.4) rotate(0deg)", opacity: 1},
-            {transform: `translate(calc(-50% + ${dx * 0.6}px), calc(-50% + ${up}px)) scale(1) rotate(${turn * 0.6}deg)`, opacity: 1, offset: 0.45},
-            {transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${fall}px)) scale(1) rotate(${turn}deg)`, opacity: 1}
-        ], {duration, easing: "cubic-bezier(.2,.6,.4,1)", fill: "forwards"});
-    }
+    // BEGIN SECTION 4 — взрыв: вспышка и части марсианина, которые врезаются в стекло экрана
+    // Мелких осколков больше нет: вместо них узнаваемые части (глаз, зубы, палец, ухо, куски шлема и скафандра)
+    // летят «на зрителя», шлёпаются о стекло с кровавой кляксой и сползают вниз, оставляя кровавый след.
+    let uid = 0;
+    // Каждая часть — SVG с объёмной заливкой (градиент), влажным бликом и кровью на месте отрыва
+    const ORGANS = {
+        // Глаз с остатками сосудов и зрительного нерва
+        eye: (id) => `<defs><radialGradient id="${id}a" cx=".4" cy=".36" r=".64"><stop offset="0" stop-color="#fffef4"/>` +
+            `<stop offset=".62" stop-color="#ecd3b6"/><stop offset="1" stop-color="#b45a4c"/></radialGradient>` +
+            `<radialGradient id="${id}b" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1a0a06"/><stop offset=".45" stop-color="#6e1209"/>` +
+            `<stop offset=".8" stop-color="#b21f12"/><stop offset="1" stop-color="#4a0a06"/></radialGradient>` +
+            `<linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5c0d12"/><stop offset=".5" stop-color="#c2414a"/><stop offset="1" stop-color="#5c0d12"/></linearGradient></defs>` +
+            `<path d="M54 60 Q66 76 74 96" stroke="url(#${id}c)" stroke-width="10" fill="none" stroke-linecap="round"/>` +
+            `<path d="M58 62 Q76 70 88 92 M50 64 Q48 82 40 98 M60 60 Q80 62 96 74" stroke="#7a1420" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+            `<path d="M56 63 Q70 66 82 84" stroke="#4b2a7a" stroke-width="1.6" fill="none" stroke-linecap="round"/>` +
+            `<ellipse cx="74" cy="96" rx="7" ry="3" fill="#7a0000"/>` +
+            `<circle cx="44" cy="42" r="32" fill="url(#${id}a)" stroke="#6e1010" stroke-width="1.2"/>` +
+            `<path d="M14 36 Q22 38 26 46 Q30 52 24 58 M16 54 Q24 52 30 58 M72 22 Q64 28 64 36 M76 50 Q66 48 62 54 M40 11 Q44 18 41 26 M24 20 Q30 26 34 24" stroke="#c4161c" stroke-width="1.2" fill="none"/>` +
+            `<circle cx="47" cy="45" r="13" fill="url(#${id}b)"/><circle cx="47" cy="45" r="5.5" fill="#030303"/>` +
+            `<path d="M39 40 Q47 34 55 40" stroke="rgba(255,255,255,.25)" stroke-width="1" fill="none"/>` +
+            `<ellipse cx="37" cy="32" rx="8" ry="5" fill="#fff" opacity=".8" transform="rotate(-25 37 32)"/>`,
+        // Печень: две доли, глянец, желчный пузырь и обрубки сосудов
+        liver: (id) => `<defs><radialGradient id="${id}" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b8443a"/>` +
+            `<stop offset=".55" stop-color="#7c1d1a"/><stop offset="1" stop-color="#3b0907"/></radialGradient></defs>` +
+            `<path d="M6 46 Q4 20 34 16 Q58 12 80 20 Q98 28 94 44 Q90 58 70 64 Q56 70 46 84 Q38 92 28 80 Q8 70 6 46 Z" fill="url(#${id})" stroke="#2a0504" stroke-width="1.5"/>` +
+            `<path d="M44 20 Q46 44 42 70" stroke="#3b0907" stroke-width="2" fill="none" opacity=".7"/>` +
+            `<ellipse cx="60" cy="62" rx="9" ry="6" fill="#5f7a2e" stroke="#2f3d14" stroke-width="1"/>` +
+            `<path d="M30 80 q-2 8 4 14 M36 82 q4 6 2 14" stroke="#8a1c28" stroke-width="4" fill="none" stroke-linecap="round"/>` +
+            `<circle cx="34" cy="94" r="3" fill="#4a0508"/>` +
+            `<path d="M20 30 Q40 22 66 26" stroke="rgba(255,255,255,.45)" stroke-width="3" fill="none" stroke-linecap="round"/>` +
+            `<ellipse cx="74" cy="34" rx="6" ry="3" fill="rgba(255,255,255,.3)" transform="rotate(20 74 34)"/>`,
+        // Оторванная трёхпалая кисть с когтями, костью и кровью на запястье
+        hand: (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9d79a"/>` +
+            `<stop offset=".5" stop-color="#8aa356"/><stop offset="1" stop-color="#4b5f27"/></linearGradient></defs>` +
+            `<path d="M34 92 Q26 70 30 56 Q22 40 14 20 Q12 12 18 12 Q24 12 28 22 L38 42 Q40 22 46 8 Q50 2 55 6 Q58 12 54 26 L52 44 Q62 28 74 18 Q80 14 84 18 Q86 24 80 30 L64 54 Q66 74 58 92 Z" fill="url(#${id})" stroke="#2f3d14" stroke-width="1.8"/>` +
+            `<path d="M18 12 Q12 2 6 4 Q12 8 16 16 Z M50 4 Q50 -6 58 -6 Q56 2 55 8 Z M84 18 Q92 10 96 14 Q90 18 84 24 Z" fill="#2a2a20"/>` +
+            `<path d="M26 32 Q32 30 34 36 M46 22 Q52 22 52 28 M70 30 Q74 34 70 38 M38 60 Q46 64 56 60" stroke="#3c4a1d" stroke-width="1.6" fill="none"/>` +
+            `<ellipse cx="46" cy="92" rx="14" ry="6" fill="#7a0000"/><ellipse cx="46" cy="91" rx="8" ry="3.2" fill="#c23b3b"/>` +
+            `<ellipse cx="46" cy="90.6" rx="3.6" ry="1.8" fill="#efe6cf"/>` +
+            `<path d="M40 96 q-2 6 1 10 M52 96 q3 5 1 9" stroke="#8a0a0a" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+        // Отдельный палец: суставы, ноготь-коготь, обрубок с костью
+        finger: (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e7432"/>` +
+            `<stop offset=".45" stop-color="#b9c98a"/><stop offset="1" stop-color="#5e7432"/></linearGradient></defs>` +
+            `<path d="M36 90 Q30 60 36 36 Q40 18 52 12 Q62 10 64 22 Q66 46 60 90 Z" fill="url(#${id})" stroke="#34401f" stroke-width="1.8"/>` +
+            `<path d="M38 62 Q48 58 60 62 M40 40 Q50 36 62 40" stroke="#3c4a1d" stroke-width="1.6" fill="none"/>` +
+            `<path d="M50 12 Q56 -2 66 2 Q62 8 62 18 Z" fill="#2a2a20"/>` +
+            `<ellipse cx="48" cy="90" rx="13" ry="5" fill="#7a0000"/><ellipse cx="48" cy="89.4" rx="5" ry="2.2" fill="#efe6cf"/>` +
+            `<path d="M44 94 q-1 6 2 9" stroke="#8a0a0a" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+        // Один зуб с корнями и кровью
+        tooth: (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf2"/>` +
+            `<stop offset=".6" stop-color="#e9dcb7"/><stop offset="1" stop-color="#b29c6a"/></linearGradient></defs>` +
+            `<path d="M24 30 Q22 10 40 10 Q50 14 60 10 Q78 10 76 30 Q74 48 66 56 L62 86 Q60 94 56 86 L52 62 Q50 58 48 62 L44 88 Q40 96 37 86 L34 56 Q26 48 24 30 Z" fill="url(#${id})" stroke="#8c7a4c" stroke-width="1.5"/>` +
+            `<path d="M34 56 Q50 62 66 56 L64 66 Q50 70 36 66 Z" fill="#9e1b2a" opacity=".85"/>` +
+            `<path d="M40 86 q-2 8 2 12 M60 86 q3 6 0 10" stroke="#8a0a0a" stroke-width="3" fill="none" stroke-linecap="round"/>` +
+            `<path d="M32 22 Q40 16 48 20" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>`,
+        // Ухо с хрящевым завитком и кровавым срезом
+        ear: (id) => `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d3dbaa"/>` +
+            `<stop offset=".55" stop-color="#a3ad74"/><stop offset="1" stop-color="#5e6a3a"/></linearGradient></defs>` +
+            `<path d="M32 90 Q12 62 24 34 Q38 6 74 4 Q60 26 64 46 Q68 70 50 92 Z" fill="url(#${id})" stroke="#3c4424" stroke-width="2"/>` +
+            `<path d="M36 78 Q26 58 34 38 Q44 22 62 14 Q50 34 54 50 Q56 64 46 80" fill="#7f8a52" opacity=".85"/>` +
+            `<path d="M42 70 Q36 56 42 44" stroke="#5a6534" stroke-width="2" fill="none"/>` +
+            `<path d="M28 90 Q40 82 54 92 L50 99 Q40 94 30 98 Z" fill="#8a0000"/>` +
+            `<path d="M30 38 Q40 18 64 10" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+        // Кусок мозга
+        brain: (id) => `<defs><radialGradient id="${id}" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#f6c7cc"/>` +
+            `<stop offset=".6" stop-color="#d98a96"/><stop offset="1" stop-color="#8e3a55"/></radialGradient></defs>` +
+            `<path d="M10 54 Q6 24 32 18 Q50 6 70 18 Q94 24 90 54 Q86 80 54 82 Q20 84 10 54 Z" fill="url(#${id})" stroke="#7d2f45" stroke-width="2"/>` +
+            `<path d="M20 40 Q30 30 38 42 Q46 52 54 40 Q62 28 74 40 M18 60 Q28 52 36 62 Q46 70 56 60 Q66 50 80 58 M50 20 Q48 40 52 76" stroke="#8e3a55" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+            `<path d="M30 78 q4 8 2 14" stroke="#9e0b0b" stroke-width="4" fill="none" stroke-linecap="round"/>` +
+            `<path d="M22 32 Q36 22 54 24" stroke="rgba(255,255,255,.5)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+        // Кусок шлема
+        helmet: () => `<path d="M8 72 Q18 18 72 6 L90 26 L62 40 L78 58 L42 66 L30 94 Z" fill="rgba(200,240,255,.38)" stroke="rgba(235,250,255,.95)" stroke-width="2"/>` +
+            `<path d="M18 60 Q26 30 60 16" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>` +
+            `<path d="M44 34 L52 48 L46 58 M60 30 L66 40" stroke="rgba(255,255,255,.9)" stroke-width="1.2" fill="none"/>` +
+            `<path d="M32 88 q4 -8 10 -6" stroke="#9e0b0b" stroke-width="4" fill="none" stroke-linecap="round"/>`
+    };
+    const ORGAN_SIZE = {eye: [84, 116], liver: [110, 150], hand: [100, 140], finger: [70, 96], tooth: [62, 84], ear: [84, 114], brain: [96, 130], helmet: [110, 150]};
 
+    // Вспышка в момент взрыва
     function explode(x, y) {
-        const pieces = [];
-        const add = (className, style, spread, lift, spin, duration) => {
-            const piece = document.createElement("div");
-            piece.className = className;
-            // setProperty понимает и обычные свойства, и CSS-переменные вроде --brain
-            Object.entries(style).forEach(([name, value]) => piece.style.setProperty(name, value));
-            fling(piece, x, y, spread, lift, spin, duration);
-            pieces.push(piece);
-            return piece;
-        };
-        // Вспышка и облако кровавой пыли в момент взрыва
         const burst = document.createElement("div");
         burst.className = "martian-burst";
         burst.style.left = x + "px";
         burst.style.top = y + "px";
         stage.appendChild(burst);
-        pieces.push(burst);
-        // Осколки шлема
-        for (let i = 0; i < 9; i++) {
-            const size = rand(8, 18);
-            add("martian-shard", {width: size + "px", height: size * rand(1.2, 2) + "px"}, 220, 160, 720, rand(700, 1000));
+        setTimeout(() => burst.remove(), 700);
+    }
+
+    // Одна часть: летит от места взрыва «на зрителя», врезается в стекло, сползает и оставляет кровавый след
+    function organHit(kind, x0, y0, delay, parts) {
+        const [minSize, maxSize] = ORGAN_SIZE[kind];
+        const size = rand(minSize, maxSize);
+        const tx = rand(0.1, 0.88) * window.innerWidth, ty = rand(0.08, 0.5) * window.innerHeight;
+        const organ = document.createElement("div");
+        organ.className = "martian-organ";
+        organ.style.width = organ.style.height = size + "px";
+        organ.style.left = tx - size / 2 + "px";
+        organ.style.top = ty - size / 2 + "px";
+        organ.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true">${ORGANS[kind](`martian-organ-${uid++}`)}</svg>`; // разметка из этого файла
+        organ.style.opacity = "0";
+        stage.appendChild(organ);
+        parts.push(organ);
+        const spin = rand(-40, 40);
+        setTimeout(() => {
+            organ.style.opacity = "1";
+            // Полёт: из глубины, от места взрыва, быстро растёт — будто летит прямо в экран
+            organ.animate([
+                {transform: `translate(${x0 - tx}px, ${y0 - ty}px) scale(.12) rotate(${spin - 120}deg)`},
+                {transform: `translate(0, 0) scale(1.08) rotate(${spin}deg)`, offset: .85},
+                {transform: `translate(0, 0) scale(1) rotate(${spin}deg)`}
+            ], {duration: 430, easing: "cubic-bezier(.5,0,.9,.6)", fill: "forwards"});
+        }, delay);
+        // Шлепок о стекло: клякса под частью и звук
+        setTimeout(() => {
+            const splat = document.createElement("div");
+            splat.className = "martian-glass";
+            const splatSize = size * rand(1.6, 2.1);
+            splat.style.width = splatSize + "px";
+            splat.style.height = splatSize * 260 / 220 + "px";
+            splat.style.left = tx - splatSize / 2 + "px";
+            splat.style.top = ty - splatSize * 0.42 + "px";
+            splat.innerHTML = splatSVG(pick(BLOOD), kind === "brain"); // разметка строится в этом файле из чисел
+            stage.insertBefore(splat, organ);
+            parts.push(splat);
+            playSplat(0.55, kind === "helmet");
+        }, delay + 380);
+        // Сползание: часть медленно съезжает вниз, за ней тянется полоса размазанной крови
+        const slide = rand(90, 230), slideTime = rand(2800, 4400), slideStart = delay + rand(800, 1400);
+        setTimeout(() => {
+            const smear = document.createElement("div");
+            smear.className = "martian-smear";
+            const width = size * rand(0.32, 0.5);
+            smear.style.width = width + "px";
+            smear.style.height = slide + "px";
+            smear.style.left = tx - width / 2 + "px";
+            smear.style.top = ty + "px";
+            smear.style.setProperty("--smear", pick(BLOOD));
+            stage.insertBefore(smear, organ);
+            parts.push(smear);
+            smear.animate([{transform: "scaleY(0)"}, {transform: "scaleY(1)"}],
+                {duration: slideTime, easing: "cubic-bezier(.45,0,.75,.6)", fill: "forwards"});
+            organ.animate([
+                {transform: `translate(0, 0) scale(1) rotate(${spin}deg)`},
+                {transform: `translate(${rand(-12, 12)}px, ${slide}px) scale(1) rotate(${spin + rand(-25, 25)}deg)`}
+            ], {duration: slideTime, easing: "cubic-bezier(.45,0,.75,.6)", fill: "forwards"});
+        }, slideStart);
+        return slideStart + slideTime;
+    }
+
+    // У каждого взорвавшегося марсианина свой набор частей, прилетающих в разное время
+    function organsFrom(x, y) {
+        const kinds = Object.keys(ORGANS).sort(() => Math.random() - 0.5).slice(0, Math.round(rand(3, 5)));
+        let delay = 120, done = 0;
+        const parts = []; // кляксы и следы добавляются сюда по мере появления — в конце убираем всё разом
+        for (const kind of kinds) {
+            done = Math.max(done, organHit(kind, x, y, delay, parts));
+            delay += rand(260, 700);
         }
-        // Кровь: много вытянутых капель
-        for (let i = 0; i < 26; i++) {
-            const size = rand(4, 13);
-            add("martian-blood", {width: size + "px", height: size * rand(1, 1.8) + "px", background: pick(BLOOD)}, 260, 200, 90, rand(650, 1100));
-        }
-        // Куски мозга с извилинами
-        for (let i = 0; i < 7; i++) {
-            const size = rand(14, 28);
-            add("martian-brain", {width: size + "px", height: size * rand(.7, 1) + "px", "--brain": pick(BRAIN)}, 200, 150, 260, rand(800, 1200));
-        }
-        // Зелёная слизь
-        for (let i = 0; i < 6; i++) {
-            const size = rand(7, 15);
-            add("martian-goo", {width: size + "px", height: size + "px", background: pick(GOO)}, 180, 120, 60, rand(700, 1000));
-        }
-        // Глаз: улетает дальше всех, потом моргает и укатывается
-        const eye = add("martian-eyeball", {}, 240, 190, 540, 1100);
-        return {pieces, eye};
+        return {parts, done};
     }
 
     // Клякса как SVG: неровное пятно с выплесками-лучами, капли вокруг, подтёки вниз и влажный блик.
@@ -373,6 +501,59 @@
             // нет Web Audio — просто без звука
         }
     }
+    // «Пиу»: короткий свист бластера, падающий сверху вниз
+    function playPew() {
+        try {
+            const m = music();
+            const volume = (m ? m.volume : 0.5) * 0.35;
+            if (volume <= 0) return;
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === "suspended") audioCtx.resume();
+            const now = audioCtx.currentTime;
+            ["square", "sawtooth"].forEach((type, i) => {
+                const oscillator = audioCtx.createOscillator();
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(1700 + i * 40, now);
+                oscillator.frequency.exponentialRampToValueAtTime(240, now + 0.2);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(volume * (i ? 0.5 : 1), now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                oscillator.connect(gain).connect(audioCtx.destination);
+                oscillator.start(now);
+                oscillator.stop(now + 0.24);
+            });
+        } catch (e) {
+            // нет Web Audio — без звука
+        }
+    }
+
+    // Выстрел: луч из дула бластера через весь экран, вспышка у дула и звук
+    function fireBlaster(martian) {
+        const muzzle = martian.el.querySelector(".martian-gun circle");
+        if (!muzzle) return;
+        const m = muzzle.getBoundingClientRect();
+        const x = m.left + m.width / 2, y = m.top + m.height / 2;
+        const aimX = window.innerWidth * rand(0.25, 0.75), aimY = window.innerHeight * rand(0.2, 0.7);
+        const angle = Math.atan2(aimY - y, aimX - x);
+        const beam = document.createElement("div");
+        beam.className = "martian-beam";
+        beam.style.left = x + "px";
+        beam.style.top = y + "px";
+        beam.style.width = Math.hypot(window.innerWidth, window.innerHeight) * 1.2 + "px";
+        stage.appendChild(beam);
+        beam.animate([
+            {transform: `rotate(${angle}rad) scaleX(0)`, opacity: 1},
+            {transform: `rotate(${angle}rad) scaleX(1)`, opacity: 1, offset: 0.3},
+            {transform: `rotate(${angle}rad) scaleX(1)`, opacity: 0}
+        ], {duration: 420, easing: "ease-out", fill: "forwards"});
+        const flash = document.createElement("div");
+        flash.className = "martian-flash";
+        flash.style.left = x + "px";
+        flash.style.top = y + "px";
+        stage.appendChild(flash);
+        playPew();
+        setTimeout(() => { beam.remove(); flash.remove(); }, 450);
+    }
     // END SECTION 5
 
     // BEGIN SECTION 6 — толпа, танец и взрывы
@@ -399,12 +580,24 @@
         martian.el.classList.add("quiet");
         clearInterval(martian.fidget);
         let peeking = false;
+        // Появился — сразу палит, не дожидаясь музыки: марсиане должны мешать
+        setTimeout(() => { if (martian.state === "quiet" && canShow()) volley(martian); }, rand(500, 1200));
         martian.fidget = setInterval(() => {
             if (martian.state !== "quiet") return;
             peeking = !peeking;
             martian.el.style.transform = peeking ? martian.spot.peek : martian.spot.shown;
+            if (!peeking && canShow() && Math.random() < 0.55) setTimeout(() => volley(martian), 600);
         }, rand(3000, 7000));
         updateHint();
+    }
+
+    // Один-два выстрела подряд
+    function volley(martian) {
+        if (!martian.el.isConnected) return;
+        martian.el.classList.add("shooting");
+        fireBlaster(martian);
+        if (Math.random() < 0.55) setTimeout(() => martian.el.isConnected && fireBlaster(martian), 380);
+        setTimeout(() => martian.el.classList.remove("shooting"), 800);
     }
 
     function doom(martian) {
@@ -443,46 +636,45 @@
         martian.state = "popping";
         const el = martian.el;
         el.classList.add("frenzy");               // глаза навыкате, вены пульсируют, шлем трескается
-        await wait(1100);
+        await wait(250);
+        fireBlaster(martian);                     // пиу!
+        await wait(420);
+        if (Math.random() < 0.6) fireBlaster(martian); // иногда второй выстрел
+        await wait(430);
         el.classList.add("swelling");             // голова раздувается
         await wait(1500);
         const head = el.querySelector(".martian-head").getBoundingClientRect();
         el.classList.add("popped");               // ба-бах
-        const {pieces, eye} = explode(head.left + head.width / 2, head.top + head.height * 0.45);
+        const x = head.left + head.width / 2, y = head.top + head.height * 0.45;
+        explode(x, y);
         playSplat(0.8, true);
-        aftermath(martian, pieces, eye);
+        aftermath(martian, organsFrom(x, y));
     }
 
-    // Развязка: тело ощупывает пустую шею и бодро машет, глаз моргает и укатывается, всё тает
-    async function aftermath(martian, pieces, eye) {
+    // Развязка: тело без головы вылезает целиком, ощупывает шею, машет, падает и уползает; части на стекле тают
+    async function aftermath(martian, organs) {
         const el = martian.el;
-        // Примерно каждый третий раз часть брызг прилетает прямо на экран
-        let glass = [];
-        if (Math.random() < 0.38) {
-            await wait(220);
-            glass = screenSplat();
-        }
-        await wait(1000);
-        eye.classList.add("blinking");
+        el.style.transform = martian.spot.out;    // тело хорошо видно, а не прячется за краем
+        await wait(700);
         el.classList.add("searching");
         await wait(1800);
         el.classList.remove("searching");
         el.classList.add("waving");
-        const rolled = getComputedStyle(eye).transform;
-        eye.animate([
-            {transform: rolled},
-            {transform: `${rolled} translateX(${rand(-260, 260)}px) rotate(${rand(-720, 720)}deg)`}
-        ], {duration: 1600, easing: "ease-in", fill: "forwards"});
+        await wait(1500);
+        el.classList.remove("waving");
+        el.classList.add("fallen");               // падает навзничь
+        await wait(1100);
+        el.style.transform = martian.spot.hidden; // и уползает
         await wait(900);
-        el.style.transform = martian.spot.hidden; // тело уползает обратно
-        pieces.forEach(piece => piece.classList.add("fading"));
-        await wait(2300);
         el.remove();
         crowd.splice(crowd.indexOf(martian), 1);
-        pieces.forEach(piece => piece.remove());
-        glass.forEach(blob => blob.classList.add("fading"));
+        // Части досползают, потом всё тает
+        const rest = organs.done - 6000;
+        if (rest > 0) await wait(rest);
+        await wait(1200);
+        organs.parts.forEach(part => part.classList.add("fading"));
         await wait(1500);
-        glass.forEach(blob => blob.remove());
+        organs.parts.forEach(part => part.remove());
     }
 
     function schedule(range) {
