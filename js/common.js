@@ -148,7 +148,7 @@
             },
             {
                 "src": "music/12.mp3",
-                "title": "12"
+                "title": "Rover Signal (12)"
             },
             {
                 "src": "music/1-Мачете-Крайний-Край-MYH132.mp3",
@@ -180,28 +180,40 @@
         }
 
         const playlist = getPlaylistFor(currentFile);
-        const computePlaylistId = (pl) => pl.map(p => p.src).join("|");
 
-        const playlistId = computePlaylistId(playlist);
-// restore index if same playlist is saved
-        let savedPlaylistId = null;
-        let savedIndex = null;
+        // ---------------------- Свой саундтрек у каждой страницы ----------------------
+        // Страницы — как отдельные станции: у каждой своя музыка. При переходе текущий трек плавно затихает,
+        // новая страница плавно включает свой трек (и коротко показывает, что играет). Каждая страница помнит,
+        // где остановилась её музыка, и при возвращении продолжает с этого места. Остальные треки плейлиста
+        // играют дальше по кругу — кнопками ⏮ ⏭ и после окончания трека.
+        const PAGE_SOUNDTRACK = {
+            "index.html": "music/33.mp3",
+            "history.html": "music/11.mp3",
+            "myths.html": "music/999.mp3",
+            "photos.html": "music/888.mp3",
+            "videos.html": "music/777.mp3",
+            "rover.html": "music/12.mp3",
+            "about.html": "music/Home - Eva Poklonskaya.mp3"
+        };
+        const PAGE_KEY = "siteAudioPage:" + currentFile;
+        const FADE_OUT_MS = 320;   // уход со страницы
+        const FADE_IN_MS = 1200;   // приход на страницу
+        const pageTrackIndex = () => {
+            const i = playlist.findIndex(p => p.src === PAGE_SOUNDTRACK[currentFile]);
+            return i >= 0 ? i : hashToInt(currentFile) % Math.max(1, playlist.length);
+        };
+        let savedPage = null;
         try {
-            savedPlaylistId = localStorage.getItem("siteAudioPlaylistId");
-            savedIndex = parseInt(localStorage.getItem("siteAudioIndex"), 10);
-            if (isNaN(savedIndex)) savedIndex = null;
+            savedPage = JSON.parse(localStorage.getItem(PAGE_KEY));
+            // прежняя общая память «один трек на весь сайт» больше не нужна
+            ["siteAudioPlaylistId", "siteAudioIndex", "siteAudioTime"].forEach(key => localStorage.removeItem(key));
         } catch (e) {
-            savedPlaylistId = null;
-            savedIndex = null;
+            savedPage = null;
         }
-
-        let currentIndex = 0;
-        if (savedPlaylistId && savedPlaylistId === playlistId && savedIndex !== null) {
-            currentIndex = savedIndex;
-        } else {
-            // choose start by page hash to vary starting track across pages
-            currentIndex = hashToInt(currentFile) % Math.max(1, playlist.length);
-        }
+        const savedPageValid = savedPage && Number.isInteger(savedPage.index) &&
+            savedPage.index >= 0 && savedPage.index < playlist.length;
+        let currentIndex = savedPageValid ? savedPage.index : pageTrackIndex();
+        const savedTime = savedPageValid && Number.isFinite(savedPage.time) ? Math.max(0, savedPage.time) : 0;
 
 // ---------------------- Audio controls wiring ----------------------
         const audioEl = document.getElementById("site-audio");
@@ -221,24 +233,52 @@
         function savePlaybackState() {
             saveState();
             try {
-                localStorage.setItem("siteAudioTime", String(audioEl.currentTime));
                 localStorage.setItem("siteAudioPlaying", String(!audioEl.paused));
             } catch (e) {}
         }
         // КОНЕЦ ФУНКЦИИ savePlaybackState
 
+        // НАЧАЛО ФУНКЦИИ fadeTo
+        // Плавное изменение громкости; ползунок громкости прерывает его в любой момент.
+        let fadeTimer = null;
+        function sliderVolume() {
+            const value = parseFloat(volRange.value);
+            return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.5;
+        }
+        function fadeTo(target, ms, done) {
+            clearInterval(fadeTimer);
+            fadeTimer = null;
+            const from = audioEl.volume;
+            const start = performance.now();
+            if (!(ms > 0) || from === target) { audioEl.volume = target; if (done) done(); return; }
+            fadeTimer = setInterval(() => {
+                const k = Math.min(1, (performance.now() - start) / ms);
+                audioEl.volume = from + (target - from) * k * k * (3 - 2 * k);
+                if (k >= 1) { clearInterval(fadeTimer); fadeTimer = null; if (done) done(); }
+            }, 30);
+        }
+        // КОНЕЦ ФУНКЦИИ fadeTo
+
         // НАЧАЛО ФУНКЦИИ playCurrentTrack
-        function playCurrentTrack() {
+        // fadeIn — приход на страницу: трек начинается тихо и плавно набирает громкость ползунка.
+        function playCurrentTrack(fadeIn = false) {
             const version = trackVersion;
             playbackRequested = true;
+            clearInterval(fadeTimer);
+            fadeTimer = null;
+            audioEl.volume = fadeIn ? 0 : sliderVolume();
             let attempt;
             try { attempt = audioEl.play(); }
-            catch (error) { return Promise.reject(error); }
+            catch (error) { audioEl.volume = sliderVolume(); return Promise.reject(error); }
             return Promise.resolve(attempt).then(() => {
                 if (version !== trackVersion) return;
                 if (!playbackRequested) { audioEl.pause(); return; }
+                if (fadeIn) fadeTo(sliderVolume(), FADE_IN_MS);
                 savePlaybackState();
                 updateToggleText();
+            }, error => {
+                audioEl.volume = sliderVolume();
+                throw error;
             });
         }
         // КОНЕЦ ФУНКЦИИ playCurrentTrack
@@ -246,8 +286,8 @@
 
         function saveState() {
             try {
-                localStorage.setItem("siteAudioPlaylistId", playlistId);
-                localStorage.setItem("siteAudioIndex", String(currentIndex));
+                const time = audioEl && Number.isFinite(audioEl.currentTime) ? audioEl.currentTime : 0;
+                localStorage.setItem(PAGE_KEY, JSON.stringify({index: currentIndex, time}));
             } catch (e) {
             }
         }
@@ -311,19 +351,17 @@
 
         updateToggleText();
 
-// Restore both position and pause intent; source generation prevents an old metadata callback
-// from seeking/starting a different track selected while the previous file was loading.
+// Restore this page's position and the site-wide "music on" intent; source generation prevents an old
+// metadata callback from seeking/starting a different track selected while the previous file was loading.
         try {
             const wasPlaying = localStorage.getItem("siteAudioPlaying") === "true";
-            const savedTime = savedPlaylistId === playlistId ? parseFloat(localStorage.getItem("siteAudioTime")) : 0;
-            localStorage.removeItem("siteAudioTime");
             const version = trackVersion;
-            const startPlayback = () => playCurrentTrack().catch(() => {
+            const startPlayback = () => playCurrentTrack(true).then(announcePageTrack).catch(() => {
                 const resume = ev => {
                     removeResume();
                     if (ev.target.closest && ev.target.closest(".site-audio-controls")) return;
                     if (!audioEl.paused || !playbackRequested) return;
-                    playCurrentTrack().catch(updateToggleText);
+                    playCurrentTrack(true).then(announcePageTrack).catch(updateToggleText);
                 };
                 const removeResume = () => ["pointerdown", "keydown"].forEach(type => document.removeEventListener(type, resume, true));
                 ["pointerdown", "keydown"].forEach(type => document.addEventListener(type, resume, true));
@@ -395,6 +433,8 @@
         });
 
         volRange.addEventListener("input", () => {
+            clearInterval(fadeTimer);
+            fadeTimer = null;
             audioEl.volume = parseFloat(volRange.value);
             try {
                 localStorage.setItem("siteAudioVol", volRange.value);
@@ -403,28 +443,41 @@
         });
 
 
-        // ---------------------- navigation saving (when clicking menu links) ----------------------
+        // ---------------------- переход по меню: музыка этой страницы плавно затихает ----------------------
         navLinks.forEach(a => {
             a.addEventListener("click", (ev) => {
                 const href = a.getAttribute("href");
-                if (!href) return;
-                if (href.startsWith("http") || href.startsWith("#")) return;
-                const targetFile = href.split("/").pop();
-                const targetPlaylist = getPlaylistFor(targetFile);
-                const targetId = computePlaylistId(targetPlaylist);
-                if (targetId === playlistId) {
-                    savePlaybackState();
-                } else {
-                    try {
-                        localStorage.setItem("siteAudioPlaylistId", targetId);
-                        localStorage.setItem("siteAudioIndex", String(hashToInt(targetFile) % Math.max(1, targetPlaylist.length)));
-                        localStorage.removeItem("siteAudioTime");
-                        localStorage.setItem("siteAudioPlaying", String(!audioEl.paused));
-                    } catch (e) {}
-                }
-                // navigation proceeds normally
+                if (!href || href.startsWith("http") || href.startsWith("#")) return;
+                if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                savePlaybackState();
+                if (audioEl.paused || href.split("/").pop() === currentFile) return; // тишина — обычный переход
+                ev.preventDefault();
+                fadeTo(0, FADE_OUT_MS, () => { window.location.href = href; });
             });
         });
+
+        // ---------------------- подпись «что играет на этой странице» ----------------------
+        // На несколько секунд под плеером: «♪ History · Red Plains». Скрыта от экранного диктора как декор —
+        // само название трека всегда есть в плеере.
+        let announceTimer = null;
+        function announcePageTrack() {
+            const item = playlist[currentIndex];
+            if (!item) return;
+            const controls = document.querySelector(".site-audio-controls");
+            if (!controls) return;
+            let toast = document.getElementById("site-audio-toast");
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "site-audio-toast";
+                toast.className = "site-audio-toast";
+                toast.setAttribute("aria-hidden", "true");
+                controls.appendChild(toast);
+            }
+            toast.textContent = "\u266A " + (matchedLabel || document.title) + " \u00B7 " + (item.title || "");
+            toast.classList.add("visible");
+            clearTimeout(announceTimer);
+            announceTimer = setTimeout(() => toast.classList.remove("visible"), 4200);
+        }
 
         // НАЧАЛО РАЗДЕЛА сохранения при навигации и BFCache
         window.addEventListener("pagehide", () => {
@@ -437,7 +490,9 @@
             audioEl.pause();
         });
         window.addEventListener("pageshow", event => {
-            if (event.persisted && resumeAfterPageShow) playCurrentTrack().catch(updateToggleText);
+            if (!event.persisted) return;
+            if (resumeAfterPageShow) playCurrentTrack(true).then(announcePageTrack).catch(updateToggleText);
+            else audioEl.volume = sliderVolume();
         });
         // КОНЕЦ РАЗДЕЛА сохранения при навигации и BFCache
 
