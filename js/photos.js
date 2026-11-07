@@ -47,6 +47,14 @@ const galleryPhotos = [
     {
         src: "Images/1976-900x506.jpg",
         alt: "Artist's view: a rocky shore on a wetter, ancient Mars"
+    },
+    {
+        src: "Images/opportunity-payson-ridge-erebus-crater.webp",
+        alt: "Payson Ridge on the rim of Erebus Crater, a panorama by NASA's Opportunity rover (NASA/JPL-Caltech/Cornell)"
+    },
+    {
+        src: "Images/AQAKdlL3vPHLWVX7KKeIoQ3VIaO6x4Qe--_y8yEJzsYyfE4YnSaOTuggo845KMGopsMZBkmBuCjEJpGq4zWlNSkPYAw.webp",
+        alt: "Illustration: a green Mars, with leafy plants growing on the red plains"
     }
 
 ];
@@ -66,7 +74,7 @@ function generateGallery() {
 
     // Создаем ОДНУ общую строку для всей сетки
     const row = document.createElement('div');
-    row.className = 'row g-3'; // Ровные отступы Bootstrap
+    row.className = 'row g-3 justify-content-center'; // Ровные отступы Bootstrap; неполный последний ряд — по центру
 
     for (let i = 0; i < galleryPhotos.length; i++) {
         const photo = galleryPhotos[i];
