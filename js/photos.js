@@ -37,12 +37,12 @@ const galleryPhotos = [
         alt: "Mars in true colour, photographed by the OSIRIS camera of ESA's Rosetta probe"
     },
     {
-        src: "Images/istockphoto-2057625445-2048x2048.jpg",
-        alt: "Illustration: Mars rising above Earth (stock image)"
+        src: "Images/perseverance-sky-crane-landing.webp",
+        alt: "Perseverance hangs on the sky crane's cables seconds before touchdown, shot from the descent stage (NASA/JPL-Caltech)"
     },
     {
-        src: "Images/istockphoto-1621445968-2048x2048.jpg",
-        alt: "Illustration: an astronaut walking on Mars (stock image)"
+        src: "Images/pathfinder-sojourner-on-mars.webp",
+        alt: "Sojourner, the first Mars rover, among the rocks of Ares Vallis, seen from the Pathfinder lander in 1997 (NASA/JPL)"
     },
     {
         src: "Images/1976-900x506.jpg",

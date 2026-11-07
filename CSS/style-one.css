@@ -537,3 +537,8 @@ a:hover {
 @media (prefers-reduced-motion: reduce) {
     .site-audio-toast { transition: none; }
 }
+
+/* Подвал: снизу место под плавающую кнопку «Back to Top», чтобы она не закрывала последнюю ссылку подвала */
+#site-footer-container footer {
+    padding-bottom: 4.5rem;
+}
