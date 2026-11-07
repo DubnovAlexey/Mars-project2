@@ -12,6 +12,8 @@
 //      экрана с кровавой кляксой и медленно сползают, размазывая кровь. Тело без головы вылезает целиком,
 //      ощупывает шею, машет, падает и только потом уползает.
 //   Музыку выключили — те, кто ещё не начал взрываться, снова просто мешают.
+//   На многостраничном сайте толпа переходит вместе с посетителем: пока музыка молчит, марсиане, сидящие у краёв,
+//   запоминаются при уходе со страницы и сразу оказываются на тех же местах на следующей (память вкладки).
 // Только персонажи: никаких надписей и реплик. Рисунок свой (SVG ниже), звук генерирует браузер (Web Audio).
 // Работает на любой странице с музыкой: ищет <audio> с атрибутом data-martian-music, #site-audio или #playlistAudio.
 // Не появляется при «уменьшить анимацию» в системе, при открытом окне Bootstrap и на скрытой вкладке.
@@ -558,6 +560,56 @@
 
     // BEGIN SECTION 6 — толпа, танец и взрывы
     // Новый марсианин выглядывает; в тишине остаётся мешать, под музыку встаёт в очередь на взрыв.
+    // Толпа переходит со страницы на страницу, пока музыка молчит: при уходе запоминаем, кто где сидит,
+    // на новой странице они сразу на своих местах. Память вкладки (sessionStorage) живёт, пока вкладка открыта.
+    const CARRY_KEY = "martians:crowd";
+    const CARRY_MAX_AGE_MS = 10 * 60 * 1000;
+    const CARRY_STYLES = ["left", "right", "top", "bottom"];
+
+    function saveCrowd() {
+        try {
+            const seats = crowd.filter(m => m.state === "quiet" && m.el.isConnected).map(m => {
+                const seat = {spot: m.spot.name};
+                CARRY_STYLES.forEach(side => { if (m.el.style[side]) seat[side] = m.el.style[side]; });
+                return seat;
+            });
+            sessionStorage.setItem(CARRY_KEY, JSON.stringify({savedAt: Date.now(), seats}));
+        } catch (e) { /* хранилище недоступно — на новой странице толпа соберётся заново */ }
+    }
+
+    function restoreCrowd() {
+        let saved = null;
+        try { saved = JSON.parse(sessionStorage.getItem(CARRY_KEY)); } catch (e) { saved = null; }
+        if (!saved || !Array.isArray(saved.seats) || !(Date.now() - saved.savedAt < CARRY_MAX_AGE_MS)) return 0;
+        const maxX = Math.max(0, window.innerWidth - 100), maxY = Math.max(0, window.innerHeight - 132);
+        let restored = 0;
+        for (const seat of saved.seats.slice(0, MAX_CROWD)) {
+            const spot = SPOTS.find(s => s.name === seat.spot);
+            if (!spot) continue;
+            const el = document.createElement("div");
+            el.className = "martian";
+            el.innerHTML = MARTIAN_SVG; // постоянная разметка из этого файла, без данных пользователя
+            placeMartian(el, spot);
+            CARRY_STYLES.forEach(side => {
+                const value = parseFloat(seat[side]);
+                if (!Number.isFinite(value)) return;
+                const limit = side === "left" || side === "right" ? maxX : maxY;
+                el.style[side] = Math.max(-10, Math.min(limit, value)) + "px";
+            });
+            // Сразу на месте, без повторного «выползания»: на старой странице он уже сидел здесь
+            el.style.transition = "none";
+            el.style.transform = spot.shown;
+            stage.appendChild(el);
+            const martian = {el, spot, state: "quiet", fidget: null};
+            crowd.push(martian);
+            requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = ""; }));
+            if (musicPlaying()) doom(martian);
+            else quiet(martian);
+            restored++;
+        }
+        return restored;
+    }
+
     async function spawn() {
         if (!canShow() || crowd.length >= MAX_CROWD) return;
         const el = document.createElement("div");
@@ -705,7 +757,10 @@
             updateHint();
             schedule(QUIET_DELAY);
         });
-        schedule([4000, 8000]);
+        // Уход со страницы: запоминаем тех, кто сидит у краёв. Возврат из кэша «назад» оставляет толпу как была.
+        window.addEventListener("pagehide", saveCrowd);
+        const carried = restoreCrowd();
+        schedule(carried ? QUIET_DELAY : [4000, 8000]);
     }
     // END SECTION 6
 

@@ -13,11 +13,18 @@
     text-align: left;
 }
 
-/* Сетка карточек: картинки внутри .card по умолчанию сильно увеличиваются при наведении,
-   здесь вместо этого приподнимается вся карточка */
-.nasa-grid .card img:hover,
-.nasa-grid img:hover {
-    transform: none;
+/* Сетка карточек Rover и Videos ведёт себя как карточки Myths: наведённая карточка чуть растёт, а снимок в ней —
+   в полтора раза и поднимается над соседними карточками. */
+.nasa-grid > [class*="col"] {
+    position: relative;
+    z-index: 1;
+    transition: z-index 0s 0.3s;
+}
+
+.nasa-grid > [class*="col"]:hover,
+.nasa-grid > [class*="col"]:focus-within {
+    z-index: 10;
+    transition-delay: 0s;
 }
 
 .nasa-item {
@@ -36,12 +43,13 @@
 
 .nasa-item:hover,
 .nasa-item:focus-visible {
-    transform: translateY(-4px);
+    transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     outline: none;
 }
 
 .nasa-item img {
+    position: relative;
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
@@ -49,6 +57,17 @@
     border: 2px solid #ccc;
     background: #222;
     margin: 0 0 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nasa-item img:hover {
+    transform: scale(1.5);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nasa-item,
+    .nasa-item img { transition: none; }
 }
 
 /* Placeholder card while the NASA feed is still answering: a dark photo frame and two text lines with a soft

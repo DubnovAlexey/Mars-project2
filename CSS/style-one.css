@@ -451,8 +451,28 @@ a:hover {
 }
 
 /* ======= Подписи под фото галереи ======= */
+/* Наведённое фото растёт, как картинки на Myths и History, и поднимается над соседями.
+   z-index возвращается с задержкой, чтобы уменьшающееся фото не уходило под соседнее раньше времени. */
 .gallery-figure {
+    position: relative;
+    z-index: 1;
     margin: 0;
+    transition: z-index 0s 0.3s;
+}
+
+.gallery-figure:hover {
+    z-index: 10;
+    transition-delay: 0s;
+}
+
+.gallery-figure img {
+    border-radius: 6px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-figure:hover img {
+    transform: scale(1.4);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
 }
 
 .gallery-caption {
@@ -467,6 +487,10 @@ a:hover {
     .gallery-caption {
         font-size: 0.7rem;
     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gallery-figure img { transition: none; }
 }
 
 /* Подпись с автором под снимком в мифах */
