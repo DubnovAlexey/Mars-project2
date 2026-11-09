@@ -8,14 +8,16 @@
     <link type="image/x-icon" rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/4287/4287555.png"/>
     <link rel="stylesheet" href="./CSS/style-one.css"/>
     <link rel="stylesheet" href="./CSS/martians.css"/>
+    <link rel="stylesheet" href="./CSS/i18n.css"/>
+    <script src="./js/i18n.js"></script>
     <link rel="stylesheet" href="./CSS/nasa.css"/>
     <title>NASA Videos about Mars — The Newest Martian Chronicles</title>
 </head>
 <body>
 <main class="container">
-    <a href="#" class="back-to-top">⬆ Back to Top</a>
-    <h2>NASA Videos about Mars</h2>
-    <p class="nasa-intro">Landings, drives, flights and plans for the future — straight from the open NASA Image and
+    <a href="#" class="back-to-top" data-i18n="backToTop">⬆ Back to Top</a>
+    <h2 data-i18n="videos.title">NASA Videos about Mars</h2>
+    <p class="nasa-intro" data-i18n="videos.intro">Landings, drives, flights and plans for the future — straight from the open NASA Image and
         Video Library. Every video opens here, on this page, and the background music pauses while you watch.</p>
     <div id="videos-root"></div>
 </main>
@@ -25,7 +27,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="nasaVideoTitle"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-i18n-aria="modal.close"></button>
             </div>
             <div class="modal-body">
                 <video id="nasaVideoPlayer" controls playsinline preload="metadata"></video>

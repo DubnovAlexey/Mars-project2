@@ -34,7 +34,9 @@
     const HINT = {
         en: "To fight off the alien invasion, turn on the music.",
         ru: "Для борьбы с инопланетным вторжением включите музыку.",
-        he: "כדי להדוף את הפלישה החייזרית, הפעילו את המוזיקה."
+        he: "כדי להדוף את הפלישה החייזרית, הפעילו את המוזיקה.",
+        es: "Para repeler la invasión alienígena, enciende la música.",
+        fr: "Pour repousser l’invasion extraterrestre, lancez la musique."
     };
     // END SECTION 1
 

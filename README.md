@@ -1,6 +1,6 @@
 # The Newest Martian Chronicles
 
-[English](#english) · [Русский](#русский) · [עברית](#עברית)
+[English](#english) · [Русский](#русский) · [עברית](#עברית) · [Español](#español) · [Français](#français)
 
 <a name="english"></a>
 
@@ -16,7 +16,7 @@ Browse History/Myths, open a NASA video, then try the Rover camera filter and en
 
 Start with `js/data.js` and `js/common.js`, then `js/nasa.js`, `js/rover.js` and `js/forms.js`. NASA responses and media depend on the network. FormSubmit delivery is not verified by the browser; the donation form is a local validation demonstration.
 
-The language links above switch the documentation; they do not translate the existing demo interface.
+The site itself is available in five languages too — English, Russian, Hebrew (right-to-left), Spanish and French: use the globe switch in the top corner of the header. `node --test` checks that every text has all five translations.
 
 ### Features
 
@@ -87,7 +87,7 @@ These are proposals, not currently implemented features.
 
 Начните с `js/data.js` и `js/common.js`, затем изучите `js/nasa.js`, `js/rover.js`, `js/forms.js`. Ответы NASA и медиа зависят от сети. Браузер не подтверждает доставку FormSubmit; форма пожертвования демонстрирует только локальную валидацию.
 
-Языковые ссылки выше переключают документацию, а не переводят существующий интерфейс демо.
+Сам сайт тоже работает на пяти языках — английском, русском, иврите (справа налево), испанском и французском: переключатель с глобусом в верхнем углу шапки. `node --test` проверяет, что у каждого текста есть все пять переводов.
 
 ### Возможности
 
@@ -160,7 +160,7 @@ HTML5 · CSS3 · Bootstrap 5 · JavaScript (DOM, вывод из данных) �
 
 התחילו ב־`js/data.js` וב־`js/common.js`, ואז בדקו `js/nasa.js`, `js/rover.js`, `js/forms.js`. שירותי NASA והמדיה תלויים ברשת. הדפדפן אינו מאשר מסירת FormSubmit; טופס התרומה מדגים אימות מקומי בלבד.
 
-קישורי השפה למעלה מחליפים את התיעוד, ולא מתרגמים את ממשק ההדגמה הקיים.
+גם האתר עצמו זמין בחמש שפות — אנגלית, רוסית, עברית (מימין לשמאל), ספרדית וצרפתית: מתג הגלובוס בפינה העליונה של הכותרת. `node --test` בודק שלכל טקסט יש את כל חמשת התרגומים.
 
 ### יכולות
 
@@ -207,3 +207,145 @@ HTML5 · CSS3 · Bootstrap 5 · JavaScript · GitHub Pages
 - יכולות: חיפוש בציר הזמן של המשימות ושמירת מסנני Rover, לפני גלובוס תלת־ממדי אופציונלי.
 
 </div>
+
+---
+
+<a name="spanish"></a>
+
+## Español
+
+**Las novísimas crónicas marcianas**
+
+Un sitio sobre Marte de siete páginas: la historia de su exploración desde los primeros sobrevuelos hasta los róveres actuales, mitos sobre el planeta rojo, una galería de fotos, vídeos de la NASA, fotos recientes del róver Perseverance y una página sobre el proyecto. Hecho con HTML, CSS, Bootstrap y JavaScript puro.
+
+**Demo:** https://dubnovalexey.github.io/Mars-project2/
+
+### Recorrido rápido
+
+Recorre History/Myths, abre un vídeo de la NASA y prueba después el filtro de cámaras de Rover y la imagen ampliada. Cierra el vídeo para comprobar que la reproducción se detiene; el audio de fondo es opcional y lo controlas tú.
+
+Empieza por `js/data.js` y `js/common.js`, y sigue con `js/nasa.js`, `js/rover.js` y `js/forms.js`. Las respuestas y los medios de la NASA dependen de la red. El navegador no confirma la entrega de FormSubmit; el formulario de donación solo demuestra la validación local.
+
+El propio sitio también está disponible en cinco idiomas —inglés, ruso, hebreo (de derecha a izquierda), español y francés—: usa el selector del globo en la esquina superior de la cabecera. `node --test` comprueba que cada texto tenga sus cinco traducciones.
+
+### Funciones
+
+- Siete páginas: Home, History, Myths, Photo, Videos, Rover y About The Project. En todas las páginas, las imágenes crecen al pasar el ratón y se elevan sobre sus vecinas: en Myths, Videos y Rover la tarjeta crece un poco y la imagen que contiene 1,5×; en Photo, la foto 1,4×.
+- **Videos:** vídeos sobre Marte de la biblioteca abierta NASA Image and Video Library (sin clave de API), agrupados por misión; el vídeo se reproduce en una ventana dentro de la página y, mientras tanto, la música de fondo se pausa.
+- **Rover:** las fotos sin procesar más recientes del róver Perseverance de la NASA, con el sol, la cámara y el pie de foto de la propia NASA; filtro por cámara, «mostrar más» y vista ampliada. El servicio de la NASA a veces tarda 10–20 segundos en responder, así que la página nunca se queda vacía: muestra las fotos que este navegador vio la última vez, o un conjunto guardado de doce fotogramas recientes que viene con el sitio (`js/roverSnapshot.js`), o tarjetas provisionales, y pone las fotos nuevas en cuanto llegan. Las respuestas se guardan en caché una hora y, si el servidor de la NASA no contesta, la página lo dice con claridad.
+- Un único script común construye la cabecera, la navegación, el pie y las ventanas modales de Bootstrap de todas las páginas, así que el diseño se escribe una sola vez.
+- El contenido de las páginas (textos, tablas, vídeos incrustados, listas de reproducción) sale de un archivo de datos y se muestra con métodos del DOM.
+- **Cada página tiene su propia banda sonora.** Home, History, Myths, Photo, Videos, Rover y About son como emisoras distintas: si sigues el menú con la música puesta, la pista actual se apaga suavemente, la página siguiente sube poco a poco la suya y un breve rótulo bajo el reproductor dice qué suena allí («♪ History · Red Plains»). Cada página recuerda dónde se detuvo su música y continúa desde ahí cuando vuelves; si el reproductor está en pausa, sigue en pausa. Las demás pistas de la lista suenan con siguiente/anterior y al terminar una pista; el volumen se recuerda. Si el navegador bloquea el sonido en una página nueva, la música empieza con el primer clic o la primera tecla. Qué pista abre cada página se define en una sola tabla, `PAGE_SOUNDTRACK` en `js/common.js`.
+- Formularios modales: hacer una pregunta, dejar un comentario con una foto, enviar materiales con archivos (hasta 5 archivos, 10 MB), con vistas previas y comprobaciones. Los mensajes llegan por correo a través de FormSubmit, sin servidor propio. El formulario «donar a la expedición a Marte» es una demo: el número de tarjeta se comprueba en el navegador (algoritmo de Luhn) y nunca se envía a ninguna parte.
+- Cada foto de la galería tiene su propio pie; en los mitos se indican los créditos de las imágenes. La galería usa imágenes reales de las misiones en lugar de ilustraciones de archivo, entre ellas dos fotos famosas con máquinas: Perseverance colgado de los cables de la grúa aérea segundos antes de tocar el suelo (NASA/JPL-Caltech) y Sojourner, el primer róver marciano, visto desde el módulo de aterrizaje Pathfinder en 1997 (NASA/JPL), una de las imágenes más populares de la NASA Image and Video Library.
+- **Marcianos, un huevo de Pascua con humor negro** al estilo de la ciencia ficción pulp de los años cincuenta (dibujo SVG propio): marcianos con cara de calavera y enormes cerebros venosos bajo cascos de cristal. Sin música trepan desde los cuatro bordes (sobre todo desde arriba y desde abajo), estorban y enseguida disparan rayos de bláster que cruzan toda la pantalla. Cuando se juntan más de tres, en el centro de la pantalla late una alarma de peligro rojo burdeos —se hincha y se encoge con un resplandor rojo y la señal de aviso parpadea— que pide encender la música; al pulsar la alarma, se enciende la música del sitio. Con música bailan y sus cabezas revientan: un ojo con los vasos desgarrados, un hígado, una mano cortada de tres dedos, un dedo, un solo diente, una oreja, el cerebro y trozos del casco golpean uno tras otro el cristal de la pantalla con una salpicadura de sangre y se deslizan despacio hacia abajo, emborronándolo. El cuerpo sin cabeza sale, se palpa el cuello, saluda, se cae y se aleja arrastrándose: primero da miedo y luego hace gracia. Sin textos; el sonido lo genera Web Audio. Mientras la música está apagada, la multitud sigue al visitante: los marcianos sentados en los bordes se recuerdan al salir de una página y ya están en su sitio en la siguiente. Solo se puede pulsar la alarma visible; los marcianos nunca bloquean los clics y no aparecen si el sistema pide reducir el movimiento.
+- Adaptable: en el móvil, el menú y el reproductor pasan a nuevas líneas, y los vídeos y las tablas caben en la pantalla.
+
+Los formularios se envían mediante FormSubmit. Que el navegador cargue la respuesta en un marco no demuestra que el correo se haya entregado, así que los campos rellenados se conservan mientras la entrega no esté confirmada.
+
+### Música
+
+La lista de reproducción compartida contiene los **10 archivos de audio locales** y se repite en orden. La pista, la posición, el volumen y la pausa se conservan entre páginas; aun así, el navegador puede pedir un gesto del usuario para reanudar. Abajo se citan los datos de las pistas originales; las pistas añadidas sin metadatos verificados usan el nombre de su archivo.
+
+En el reproductor, las pistas tienen nombres marcianos. Las pistas reales son:
+
+- Mars Breeze — Kawtar Sadik, Rabab Najid, Jarl Flamar y otros, «DABA (Jarl Flamar Remix)»
+- Red Plains — Ugress, «The Ghost You Choose to Be»
+- Orbit Echo — Melokind, «Down On Me»
+- Dust Trail — Amanati & Roniit, «Slow»
+- Night Crater — HÆLOS, «Pray»
+
+La música pertenece a sus autores y se usa solo en este proyecto de estudio sin fines comerciales. Si tienes los derechos de una pista y quieres que se retire, abre un issue y la quitaré.
+
+### Tecnologías
+
+HTML5 · CSS3 · Bootstrap 5 · JavaScript (DOM, renderizado a partir de datos) · GitHub Pages
+
+### Qué practiqué
+
+- Separar los datos del marcado: un solo renderizador, muchas páginas.
+- Partes reutilizables del diseño insertadas con JavaScript.
+- Ajustes de diseño adaptable: filas flex que pasan a la línea siguiente, iframes fluidos con `aspect-ratio`, tablas desplazables.
+
+### Ejecución local
+
+Sirve la carpeta (por ejemplo con `npx serve .`) y abre la dirección que muestre.
+
+### Mejoras previstas
+
+Son propuestas, no funciones ya implementadas.
+
+- Visual: estados de carga y de lista vacía coherentes, imágenes de tamaño adecuado alojadas en el propio sitio con sus créditos y un favicon local de Marte.
+- Ingeniería: validar el esquema de las respuestas externas y probar los reintentos, la cancelación y la liberación de medios al cambiar de página.
+- Funciones: una cronología de misiones con búsqueda y filtros de Rover guardados antes de plantear un globo 3D opcional.
+
+---
+
+<a name="french"></a>
+
+## Français
+
+**Les toutes nouvelles chroniques martiennes**
+
+Un site de sept pages consacré à Mars : l’histoire de son exploration, des premiers survols aux rovers d’aujourd’hui, les mythes sur la planète rouge, une galerie de photos, des vidéos de la NASA, des photos récentes du rover Perseverance et une page sur le projet. Réalisé en HTML, CSS, Bootstrap et JavaScript pur.
+
+**Démo :** https://dubnovalexey.github.io/Mars-project2/
+
+### Visite rapide
+
+Parcourez History/Myths, ouvrez une vidéo de la NASA, puis essayez le filtre de caméras de Rover et l’image agrandie. Fermez la vidéo pour vérifier que la lecture s’arrête ; l’audio de fond reste facultatif et sous votre contrôle.
+
+Commencez par `js/data.js` et `js/common.js`, puis `js/nasa.js`, `js/rover.js` et `js/forms.js`. Les réponses et les médias de la NASA dépendent du réseau. Le navigateur ne confirme pas la livraison par FormSubmit ; le formulaire de don ne fait que démontrer une validation locale.
+
+Le site lui-même est lui aussi disponible en cinq langues — anglais, russe, hébreu (de droite à gauche), espagnol et français : utilisez le sélecteur au globe dans le coin supérieur de l’en-tête. `node --test` vérifie que chaque texte possède ses cinq traductions.
+
+### Fonctionnalités
+
+- Sept pages : Home, History, Myths, Photo, Videos, Rover et About The Project. Sur toutes les pages, les images grandissent au survol et passent au-dessus de leurs voisines : sur Myths, Videos et Rover, la carte grandit légèrement et l’image qu’elle contient de 1,5×, sur Photo la photo de 1,4×.
+- **Videos :** des vidéos sur Mars tirées de la bibliothèque ouverte NASA Image and Video Library (sans clé d’API), regroupées par mission ; la vidéo se lit dans une fenêtre sur la page, et la musique de fond se met en pause pendant ce temps.
+- **Rover :** les photos brutes les plus récentes du rover Perseverance de la NASA, avec le sol, la caméra et la légende de la NASA elle-même ; un filtre par caméra, « afficher plus » et une grande vue. Le flux de la NASA met parfois 10 à 20 secondes à répondre, alors la page ne reste jamais vide : elle montre les photos que ce navigateur a vues la dernière fois, ou un jeu enregistré de douze images récentes livré avec le site (`js/roverSnapshot.js`), ou des cartes d’attente, puis les remplace par les nouvelles photos dès qu’elles arrivent. Les réponses sont mises en cache pendant une heure, et si le serveur de la NASA reste muet, la page le dit clairement.
+- Un seul script commun construit l’en-tête, la navigation, le pied de page et les fenêtres modales Bootstrap de toutes les pages : la mise en page n’est écrite qu’une fois.
+- Le contenu des pages (textes, tableaux, vidéos intégrées, listes de lecture) vient d’un fichier de données et s’affiche avec les méthodes du DOM.
+- **Chaque page a sa propre bande-son.** Home, History, Myths, Photo, Videos, Rover et About sont comme des stations distinctes : si vous suivez le menu avec la musique allumée, la piste en cours s’éteint en fondu, la page suivante fait monter la sienne et une courte légende sous le lecteur indique ce qui y joue (« ♪ History · Red Plains »). Chaque page se souvient de l’endroit où sa musique s’est arrêtée et reprend à partir de là quand vous revenez ; un lecteur en pause reste en pause. Les autres pistes de la liste suivent avec suivant/précédent et à la fin d’une piste ; le volume est mémorisé. Si le navigateur bloque le son sur une nouvelle page, la musique démarre au premier clic ou à la première touche. Quelle page commence par quelle piste : une seule table, `PAGE_SOUNDTRACK` dans `js/common.js`.
+- Formulaires modaux : poser une question, laisser un commentaire avec une photo, envoyer des documents avec des fichiers (jusqu’à 5 fichiers, 10 Mo), avec aperçus et vérifications. Les messages partent par e-mail via FormSubmit, sans serveur à moi. Le formulaire « faire un don à l’expédition martienne » est une démo : le numéro de carte est vérifié dans le navigateur (algorithme de Luhn) et n’est jamais envoyé nulle part.
+- Chaque photo de la galerie a sa propre légende ; les mythes indiquent les crédits des images. La galerie utilise de vraies images de missions au lieu d’illustrations de banque d’images, dont deux clichés célèbres de machines : Perseverance suspendu aux câbles de la grue céleste quelques secondes avant de toucher le sol (NASA/JPL-Caltech) et Sojourner, le premier rover martien, vu depuis l’atterrisseur Pathfinder en 1997 (NASA/JPL), l’une des images les plus populaires de la NASA Image and Video Library.
+- **Martiens, un easter egg à l’humour noir** dans le style de la science-fiction pulp des années 1950 (dessin SVG personnel) : des martiens à tête de mort avec d’énormes cerveaux veinés sous des casques de verre. Sans musique, ils grimpent depuis les quatre bords (surtout par le haut et par le bas), gênent et tirent aussitôt des rayons de blaster à travers tout l’écran. Quand plus de trois se sont rassemblés, une alerte de danger rouge bordeaux pulse au centre de l’écran — elle gonfle et se rétracte dans une lueur rouge, le panneau d’avertissement clignote — et demande de lancer la musique ; un clic sur l’alerte lance la musique du site. Avec la musique, ils dansent et leurs têtes éclatent : un œil aux vaisseaux arrachés, un foie, une main tranchée à trois doigts, un doigt, une seule dent, une oreille, le cerveau et des morceaux de casque frappent tour à tour la vitre de l’écran dans une giclée de sang et glissent lentement vers le bas en l’étalant. Le corps sans tête sort, se tâte le cou, fait signe de la main, tombe et s’éloigne en rampant — d’abord effrayant, ensuite drôle. Aucun texte ; le son est généré par Web Audio. Tant que la musique est éteinte, la foule suit le visiteur : les martiens assis sur les bords sont mémorisés quand on quitte une page et se retrouvent déjà à leur place sur la suivante. Seule l’alerte visible peut être cliquée ; les martiens ne bloquent jamais les clics et n’apparaissent pas quand le système demande de réduire les animations.
+- Adaptatif : sur téléphone, le menu et le lecteur passent à la ligne, et les vidéos et les tableaux tiennent dans l’écran.
+
+Les formulaires sont envoyés via FormSubmit. Le chargement d’une réponse dans un cadre ne prouve pas que l’e-mail a été livré, donc les champs remplis restent disponibles tant que la livraison n’est pas confirmée.
+
+### Musique
+
+La liste de lecture partagée contient les **10 fichiers audio locaux** et se répète dans l’ordre. La piste, la position de lecture, le volume et la pause sont conservés d’une page à l’autre ; le navigateur peut toutefois exiger un geste de l’utilisateur pour reprendre. Les informations sur les pistes d’origine sont indiquées ci-dessous ; les pistes ajoutées sans métadonnées vérifiées utilisent le nom de leur fichier.
+
+Dans le lecteur, les pistes portent des noms martiens. Les vraies pistes sont :
+
+- Mars Breeze — Kawtar Sadik, Rabab Najid, Jarl Flamar et d’autres, « DABA (Jarl Flamar Remix) »
+- Red Plains — Ugress, « The Ghost You Choose to Be »
+- Orbit Echo — Melokind, « Down On Me »
+- Dust Trail — Amanati & Roniit, « Slow »
+- Night Crater — HÆLOS, « Pray »
+
+La musique appartient à ses auteurs et n’est utilisée que dans ce projet d’étude non commercial. Si vous détenez les droits d’une piste et souhaitez qu’elle soit retirée, ouvrez une issue et je la retirerai.
+
+### Technologies
+
+HTML5 · CSS3 · Bootstrap 5 · JavaScript (DOM, rendu à partir de données) · GitHub Pages
+
+### Ce que j’ai pratiqué
+
+- Séparer les données du balisage : un seul moteur de rendu, de nombreuses pages.
+- Des éléments de mise en page réutilisables, insérés par JavaScript.
+- Corrections de mise en page adaptative : lignes flex qui passent à la ligne, iframes fluides avec `aspect-ratio`, tableaux défilants.
+
+### Lancement en local
+
+Servez le dossier (par exemple avec `npx serve .`) et ouvrez l’adresse qu’il affiche.
+
+### Améliorations prévues
+
+Ce sont des propositions, pas des fonctionnalités déjà réalisées.
+
+- Visuel : des états de chargement et de liste vide cohérents, des images de taille adaptée hébergées sur le site avec leurs crédits, et un favicon local de Mars.
+- Ingénierie : valider le schéma des réponses externes et tester les nouvelles tentatives, l’annulation et la libération des médias d’une page à l’autre.
+- Fonctionnalités : une chronologie des missions avec recherche et des filtres Rover enregistrés, avant d’envisager un globe 3D optionnel.

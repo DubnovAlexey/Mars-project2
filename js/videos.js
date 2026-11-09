@@ -2,46 +2,83 @@
 // Страница Videos: видео о Марсе из открытой библиотеки NASA Image and Video Library
 // (images-api.nasa.gov — без ключа). Каждый раздел — отдельный поиск; видео открывается в окне.
 
-// 1. Разделы страницы: что искать и какое слово обязательно должно быть в названии или описании
+// 1. Разделы страницы: что искать и какое слово обязательно должно быть в названии или описании.
+// Подписи разделов — на пяти языках; сами видео и их описания приходят от НАСА по-английски.
+const roverBadge = {en: "Rover", ru: "Марсоход", he: "רובר", es: "Róver", fr: "Rover"};
 const videoSections = [
     {
-        badge: "New",
-        title: "Latest from NASA",
-        text: "The newest Mars videos in the NASA library.",
+        badge: {en: "New", ru: "Новое", he: "חדש", es: "Nuevo", fr: "Nouveau"},
+        title: {en: "Latest from NASA", ru: "Свежее от NASA", he: "החדש מ־NASA", es: "Lo último de la NASA", fr: "Les nouveautés de la NASA"},
+        text: {
+            en: "The newest Mars videos in the NASA library.",
+            ru: "Самые новые видео о Марсе в библиотеке NASA.",
+            he: "סרטוני המאדים החדשים ביותר בספריית NASA.",
+            es: "Los vídeos más recientes sobre Marte de la biblioteca de la NASA.",
+            fr: "Les vidéos les plus récentes sur Mars dans la bibliothèque de la NASA."
+        },
         query: "Mars",
         yearStart: new Date().getFullYear() - 2,
         mustHave: "mars"
     },
     {
-        badge: "Rover",
-        title: "Perseverance Rover",
-        text: "Launch, landing in Jezero Crater and the search for signs of ancient life.",
+        badge: roverBadge,
+        title: {en: "Perseverance Rover", ru: "Марсоход Perseverance", he: "הרובר Perseverance", es: "El róver Perseverance", fr: "Le rover Perseverance"},
+        text: {
+            en: "Launch, landing in Jezero Crater and the search for signs of ancient life.",
+            ru: "Запуск, посадка в кратере Езеро и поиск следов древней жизни.",
+            he: "שיגור, נחיתה במכתש ג׳זרו והחיפוש אחר סימנים לחיים קדומים.",
+            es: "Lanzamiento, aterrizaje en el cráter Jezero y búsqueda de señales de vida antigua.",
+            fr: "Lancement, atterrissage dans le cratère Jezero et recherche de traces de vie ancienne."
+        },
         query: "Perseverance rover",
         mustHave: "perseverance"
     },
     {
-        badge: "Helicopter",
-        title: "Ingenuity Mars Helicopter",
-        text: "The first powered flight on another planet and the flights that followed.",
+        badge: {en: "Helicopter", ru: "Вертолёт", he: "מסוק", es: "Helicóptero", fr: "Hélicoptère"},
+        title: {
+            en: "Ingenuity Mars Helicopter", ru: "Марсианский вертолёт Ingenuity", he: "מסוק המאדים Ingenuity",
+            es: "El helicóptero marciano Ingenuity", fr: "L’hélicoptère martien Ingenuity"
+        },
+        text: {
+            en: "The first powered flight on another planet and the flights that followed.",
+            ru: "Первый управляемый полёт на другой планете и полёты, которые за ним последовали.",
+            he: "הטיסה הממונעת הראשונה בכוכב לכת אחר והטיסות שבאו אחריה.",
+            es: "El primer vuelo propulsado en otro planeta y los vuelos que lo siguieron.",
+            fr: "Le premier vol motorisé sur une autre planète et les vols qui ont suivi."
+        },
         query: "Ingenuity helicopter",
         mustHave: "ingenuity"
     },
     {
-        badge: "Rover",
-        title: "Curiosity Rover",
-        text: "More than ten years of climbing Mount Sharp in Gale Crater.",
+        badge: roverBadge,
+        title: {en: "Curiosity Rover", ru: "Марсоход Curiosity", he: "הרובר Curiosity", es: "El róver Curiosity", fr: "Le rover Curiosity"},
+        text: {
+            en: "More than ten years of climbing Mount Sharp in Gale Crater.",
+            ru: "Больше десяти лет восхождения на гору Шарп в кратере Гейл.",
+            he: "יותר מעשר שנים של טיפוס על הר שארפ במכתש גייל.",
+            es: "Más de diez años subiendo el monte Sharp en el cráter Gale.",
+            fr: "Plus de dix ans d’ascension du mont Sharp dans le cratère Gale."
+        },
         query: "Curiosity rover Mars",
         mustHave: "curiosity"
     },
     {
-        badge: "Lander",
-        title: "InSight: Inside Mars",
-        text: "Marsquakes, meteoroid impacts and the weather, recorded by the InSight lander.",
+        badge: {en: "Lander", ru: "Посадочный модуль", he: "נחתת", es: "Módulo de aterrizaje", fr: "Atterrisseur"},
+        title: {en: "InSight: Inside Mars", ru: "InSight: внутри Марса", he: "InSight: בתוך מאדים", es: "InSight: el interior de Marte", fr: "InSight : au cœur de Mars"},
+        text: {
+            en: "Marsquakes, meteoroid impacts and the weather, recorded by the InSight lander.",
+            ru: "Марсотрясения, удары метеороидов и погода — по записям посадочного модуля InSight.",
+            he: "רעידות מאדים, פגיעות מטאורואידים ומזג האוויר, כפי שתיעדה הנחתת InSight.",
+            es: "Sismos marcianos, impactos de meteoroides y el tiempo, registrados por el módulo InSight.",
+            fr: "Séismes martiens, impacts de météoroïdes et météo, enregistrés par l’atterrisseur InSight."
+        },
         query: "Mars InSight",
         mustHave: "insight",
         titleOnly: true // «insight» — ещё и обычное английское слово, поэтому ищем только в названии
     }
 ];
+const vt = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
+const vpick = value => window.i18n ? window.i18n.pick(value) : value.en;
 
 const VIDEOS_PER_SECTION = 6;
 const VIDEO_CACHE_MS = 24 * 60 * 60 * 1000; // список видео обновляется раз в сутки
@@ -81,7 +118,7 @@ function createVideoCard(video) {
     const center = video.info.center ? " · " + video.info.center : "";
     card.appendChild(nasa.el("p", "nasa-meta", nasa.formatDate(video.info.date_created) + center));
     card.appendChild(nasa.el("p", "nasa-text", nasa.shorten(video.info.description, 140)));
-    card.appendChild(nasa.el("span", "nasa-btn", "▶ Watch"));
+    card.appendChild(nasa.el("span", "nasa-btn", vt("videos.watch")));
 
     nasa.makeClickable(card, () => openVideo(video));
     col.appendChild(card);
@@ -97,7 +134,7 @@ async function openVideo(video) {
     const player = document.getElementById("nasaVideoPlayer");
     document.getElementById("nasaVideoTitle").textContent = video.info.title;
     document.getElementById("nasaVideoMeta").textContent =
-        nasa.formatDate(video.info.date_created) + (video.info.center ? " · " + video.info.center : "") + " · Video: NASA";
+        nasa.formatDate(video.info.date_created) + (video.info.center ? " · " + video.info.center : "") + " · " + vt("videos.credit");
     document.getElementById("nasaVideoText").textContent = video.info.description || "";
     player.removeAttribute("src");
     player.querySelectorAll("track").forEach(t => t.remove());
@@ -118,8 +155,7 @@ async function openVideo(video) {
         });
     } catch (e) {
         if (request !== videoRequest) return;
-        document.getElementById("nasaVideoText").textContent =
-            "This video cannot be loaded right now. Try again later or open it in the NASA library: https://images.nasa.gov";
+        document.getElementById("nasaVideoText").textContent = vt("videos.loadError");
     }
 }
 
@@ -146,10 +182,10 @@ async function generateVideosPage() {
 
     for (const [index, section] of videoSections.entries()) {
         const article = nasa.el("article", "card");
-        article.appendChild(nasa.el("span", "badge-abs", section.badge));
-        article.appendChild(nasa.el("h2", "", section.title));
-        article.appendChild(nasa.el("p", "", section.text));
-        const status = nasa.el("p", "nasa-status", "Loading videos from NASA…");
+        article.appendChild(nasa.el("span", "badge-abs", vpick(section.badge)));
+        article.appendChild(nasa.el("h2", "", vpick(section.title)));
+        article.appendChild(nasa.el("p", "", vpick(section.text)));
+        const status = nasa.el("p", "nasa-status", vt("videos.loading"));
         article.appendChild(status);
         const row = nasa.el("div", "row g-3 nasa-grid");
         article.appendChild(row);
@@ -160,7 +196,7 @@ async function generateVideosPage() {
                 .filter(v => !shown.has(v.info.nasa_id))
                 .slice(0, VIDEOS_PER_SECTION);
             if (!videos.length) {
-                status.textContent = "No videos found in this section yet.";
+                status.textContent = vt("videos.empty");
                 continue;
             }
             status.remove();
@@ -169,7 +205,7 @@ async function generateVideosPage() {
                 row.appendChild(createVideoCard(v));
             });
         } catch (e) {
-            status.textContent = "The NASA video library is not answering. Please try again later.";
+            status.textContent = vt("videos.error");
         }
     }
 }

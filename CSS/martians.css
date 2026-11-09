@@ -266,7 +266,12 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    /* left:50% leaves only half the screen for an auto width, so on phones words broke mid-word;
+       max-content takes the text's own width and max-width keeps it on screen. break-word ignores
+       a host page's overflow-wrap:anywhere, so a word is split only when it cannot fit at all. */
+    width: max-content;
     max-width: min(580px, calc(100vw - 32px));
+    overflow-wrap: break-word;
     padding: 18px 24px;
     border: 5px solid transparent;
     border-radius: 8px;

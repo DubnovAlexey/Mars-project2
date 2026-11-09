@@ -2,24 +2,45 @@
 // Страница Rover: свежие снимки марсохода Perseverance из открытой ленты НАСА
 // (mars.nasa.gov/rss/api — без ключа). Снимки «сырые», в том виде, как пришли с Марса.
 
-// 1. Камеры для фильтра: подпись кнопки и названия приборов в ленте НАСА
+// Тексты страницы — на выбранном языке (js/i18n.js); подписи снимков от НАСА остаются английскими
+const rt = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
+const rpick = value => (value && typeof value === "object") ? (window.i18n ? window.i18n.pick(value) : value.en) : value;
+
+// 1. Камеры для фильтра: key — постоянное имя для кэша, label — подпись кнопки, instruments — приборы в ленте НАСА
 const roverCameras = [
-    {label: "All cameras", instruments: []},
-    {label: "Mastcam-Z", instruments: ["MCZ_LEFT", "MCZ_RIGHT"]},
-    {label: "Navcam", instruments: ["NAVCAM_LEFT", "NAVCAM_RIGHT"]},
-    {label: "Hazcam", instruments: ["FRONT_HAZCAM_LEFT_A", "FRONT_HAZCAM_RIGHT_A", "REAR_HAZCAM_LEFT", "REAR_HAZCAM_RIGHT"]},
-    {label: "SuperCam", instruments: ["SUPERCAM_RMI"]},
-    {label: "WATSON", instruments: ["SHERLOC_WATSON"]}
+    {key: "All cameras", label: {en: "All cameras", ru: "Все камеры", he: "כל המצלמות", es: "Todas las cámaras", fr: "Toutes les caméras"}, instruments: []},
+    {key: "Mastcam-Z", label: "Mastcam-Z", instruments: ["MCZ_LEFT", "MCZ_RIGHT"]},
+    {key: "Navcam", label: "Navcam", instruments: ["NAVCAM_LEFT", "NAVCAM_RIGHT"]},
+    {key: "Hazcam", label: "Hazcam", instruments: ["FRONT_HAZCAM_LEFT_A", "FRONT_HAZCAM_RIGHT_A", "REAR_HAZCAM_LEFT", "REAR_HAZCAM_RIGHT"]},
+    {key: "SuperCam", label: "SuperCam", instruments: ["SUPERCAM_RMI"]},
+    {key: "WATSON", label: "WATSON", instruments: ["SHERLOC_WATSON"]}
 ];
 
 // Понятные имена приборов для подписей под снимками
+const cameraLeft = {en: "left", ru: "левая", he: "שמאל", es: "izquierda", fr: "gauche"};
+const cameraRight = {en: "right", ru: "правая", he: "ימין", es: "derecha", fr: "droite"};
+const cameraSide = (name, which) => Object.fromEntries(Object.keys(which).map(code =>
+    [code, `${typeof name === "object" ? name[code] : name}, ${which[code]}`]));
+const frontHazcam = {en: "Front Hazcam", ru: "Передняя Hazcam", he: "Hazcam קדמית", es: "Hazcam delantera", fr: "Hazcam avant"};
+const rearHazcam = {en: "Rear Hazcam", ru: "Задняя Hazcam", he: "Hazcam אחורית", es: "Hazcam trasera", fr: "Hazcam arrière"};
 const instrumentNames = {
-    MCZ_LEFT: "Mastcam-Z, left", MCZ_RIGHT: "Mastcam-Z, right",
-    NAVCAM_LEFT: "Navcam, left", NAVCAM_RIGHT: "Navcam, right",
-    FRONT_HAZCAM_LEFT_A: "Front Hazcam, left", FRONT_HAZCAM_RIGHT_A: "Front Hazcam, right",
-    REAR_HAZCAM_LEFT: "Rear Hazcam, left", REAR_HAZCAM_RIGHT: "Rear Hazcam, right",
-    SUPERCAM_RMI: "SuperCam remote micro-imager", SHERLOC_WATSON: "WATSON close-up camera",
-    SKYCAM: "MEDA SkyCam", CACHECAM: "CacheCam", PIXL_MCC: "PIXL micro-context camera"
+    MCZ_LEFT: cameraSide("Mastcam-Z", cameraLeft), MCZ_RIGHT: cameraSide("Mastcam-Z", cameraRight),
+    NAVCAM_LEFT: cameraSide("Navcam", cameraLeft), NAVCAM_RIGHT: cameraSide("Navcam", cameraRight),
+    FRONT_HAZCAM_LEFT_A: cameraSide(frontHazcam, cameraLeft), FRONT_HAZCAM_RIGHT_A: cameraSide(frontHazcam, cameraRight),
+    REAR_HAZCAM_LEFT: cameraSide(rearHazcam, cameraLeft), REAR_HAZCAM_RIGHT: cameraSide(rearHazcam, cameraRight),
+    SUPERCAM_RMI: {
+        en: "SuperCam remote micro-imager", ru: "Дистанционная микрокамера SuperCam", he: "מיקרו־מצלמה מרחוק של SuperCam",
+        es: "Microcámara remota de SuperCam", fr: "Micro-imageur à distance de SuperCam"
+    },
+    SHERLOC_WATSON: {
+        en: "WATSON close-up camera", ru: "Камера крупного плана WATSON", he: "מצלמת התקריב WATSON",
+        es: "Cámara de primer plano WATSON", fr: "Caméra de gros plan WATSON"
+    },
+    SKYCAM: "MEDA SkyCam", CACHECAM: "CacheCam",
+    PIXL_MCC: {
+        en: "PIXL micro-context camera", ru: "Контекстная микрокамера PIXL", he: "מצלמת ההקשר הזעירה של PIXL",
+        es: "Cámara de microcontexto de PIXL", fr: "Caméra de micro-contexte PIXL"
+    }
 };
 
 const PHOTOS_PER_PAGE = 12;
@@ -31,7 +52,7 @@ let photoModal = null;
 let roverRequest = 0;
 
 function instrumentName(id) {
-    if (instrumentNames[id]) return instrumentNames[id];
+    if (instrumentNames[id]) return rpick(instrumentNames[id]);
     return String(id || "camera").toLowerCase().replace(/_/g, " ");
 }
 
@@ -41,7 +62,7 @@ async function loadRoverPhotos(camera, page) {
         `&num=${PHOTOS_PER_PAGE}&page=${page}&order=sol+desc&extended=sample_type::full,`;
     if (camera.instruments.length) url += "&search=" + encodeURIComponent("|" + camera.instruments.join("|"));
     // Лента НАСА бывает медленной (первый ответ — до 10 с), поэтому ждём дольше обычного
-    return nasa.getJson(url, {cacheKey: "rover:" + camera.label + ":" + page, maxAgeMs: ROVER_CACHE_MS, timeoutMs: 30000});
+    return nasa.getJson(url, {cacheKey: "rover:" + camera.key + ":" + page, maxAgeMs: ROVER_CACHE_MS, timeoutMs: 30000});
 }
 
 // 3. Карточка снимка
@@ -51,11 +72,11 @@ function createPhotoCard(photo) {
 
     const img = document.createElement("img");
     img.src = nasa.safeUrl(photo.image_files.medium || photo.image_files.small);
-    img.alt = `Perseverance, sol ${photo.sol}: ${instrumentName(photo.camera.instrument)}`;
+    img.alt = rt("rover.photoAlt", {sol: photo.sol, camera: instrumentName(photo.camera.instrument)});
     img.loading = "lazy";
     card.appendChild(img);
 
-    card.appendChild(nasa.el("h3", "", `Sol ${photo.sol}`));
+    card.appendChild(nasa.el("h3", "", rt("rover.sol", {sol: photo.sol})));
     card.appendChild(nasa.el("p", "nasa-meta", instrumentName(photo.camera.instrument)));
     card.appendChild(nasa.el("p", "nasa-meta", nasa.formatDate(photo.date_taken_utc)));
 
@@ -67,12 +88,12 @@ function createPhotoCard(photo) {
 // 4. Окно с большим снимком
 function openPhoto(photo) {
     const name = instrumentName(photo.camera.instrument);
-    document.getElementById("roverPhotoTitle").textContent = `Perseverance · Sol ${photo.sol} · ${name}`;
+    document.getElementById("roverPhotoTitle").textContent = `Perseverance · ${rt("rover.sol", {sol: photo.sol})} · ${name}`;
     const img = document.getElementById("roverPhotoImg");
     img.src = nasa.safeUrl(photo.image_files.large || photo.image_files.medium);
-    img.alt = `Perseverance, sol ${photo.sol}: ${name}`;
+    img.alt = rt("rover.photoAlt", {sol: photo.sol, camera: name});
     document.getElementById("roverPhotoMeta").textContent =
-        `Taken ${nasa.formatDate(photo.date_taken_utc)} (Earth date) · Image: ${photo.credit || "NASA/JPL-Caltech"}`;
+        rt("rover.taken", {date: nasa.formatDate(photo.date_taken_utc), credit: photo.credit || "NASA/JPL-Caltech"});
     document.getElementById("roverPhotoText").textContent = photo.caption || "";
     document.getElementById("roverPhotoFull").href = nasa.safeUrl(photo.image_files.full_res || photo.image_files.large);
     photoModal.show();
@@ -104,16 +125,14 @@ async function showPhotos(append) {
     if (!append) {
         currentPage = 0;
         grid.textContent = "";
-        const saved = nasa.readStale("rover:" + camera.label + ":0") || (camera === roverCameras[0] ? window.roverSnapshot : null);
+        const saved = nasa.readStale("rover:" + camera.key + ":0") || (camera === roverCameras[0] ? window.roverSnapshot : null);
         const savedPhotos = usablePhotos(saved);
         earlier = savedPhotos.length > 0;
         if (earlier) savedPhotos.forEach(p => grid.appendChild(createPhotoCard(p)));
         else showPlaceholders(grid);
     }
     more.hidden = true;
-    status.textContent = earlier
-        ? "Showing earlier photos while fresh ones arrive from NASA…"
-        : "Loading fresh photos from NASA — the feed is slow, it can take up to 20 seconds…";
+    status.textContent = earlier ? rt("rover.showingEarlier") : rt("rover.loading");
 
     try {
         const data = await loadRoverPhotos(camera, currentPage);
@@ -122,22 +141,25 @@ async function showPhotos(append) {
         const photos = usablePhotos(data);
         photos.forEach(p => grid.appendChild(createPhotoCard(p)));
         if (!grid.children.length) {
-            status.textContent = "No photos from this camera yet.";
+            status.textContent = rt("rover.none");
             return;
         }
         const latest = grid.querySelector("h3");
-        status.textContent = `${camera.label}: ${Number(data.total_results || 0).toLocaleString("en-US")} photos in the NASA archive. ` +
-            `Newest first — ${latest ? latest.textContent.toLowerCase() : ""}.`;
+        status.textContent = rt("rover.summary", {
+            camera: rpick(camera.label),
+            count: Number(data.total_results || 0).toLocaleString(window.i18n ? window.i18n.locale : "en-US"),
+            latest: latest ? latest.textContent.toLowerCase() : ""
+        });
         currentPage += 1;
         more.hidden = currentPage * PHOTOS_PER_PAGE >= Number(data.total_results || 0);
     } catch (e) {
         if (request !== roverRequest || camera !== currentCamera) return;
         if (earlier) {
-            status.textContent = "The NASA photo feed is not answering right now — these are earlier photos.";
+            status.textContent = rt("rover.feedDownEarlier");
             return;
         }
         grid.querySelectorAll(".nasa-skeleton").forEach(card => card.parentElement.remove());
-        status.textContent = "The NASA photo feed is not answering. Please try again later.";
+        status.textContent = rt("rover.feedDown");
     }
 }
 
@@ -145,7 +167,7 @@ async function showPhotos(append) {
 function generateRoverPage() {
     const filters = document.getElementById("rover-filters");
     roverCameras.forEach((camera, i) => {
-        const btn = nasa.el("button", i === 0 ? "active" : "", camera.label);
+        const btn = nasa.el("button", i === 0 ? "active" : "", rpick(camera.label));
         btn.type = "button";
         btn.setAttribute("aria-pressed", String(i === 0));
         btn.addEventListener("click", () => {

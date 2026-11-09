@@ -11,6 +11,9 @@ const FORM_ENDPOINT = "https://formsubmit.co/dubnovalexey@gmail.com";
 const MAX_FILES = 5;
 const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
 
+// Сообщения форм — на выбранном языке (словарь в js/i18n.js)
+const tr = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
+
 function setFormStatus(form, text, kind) {
     const status = form.querySelector(".form-status");
     if (!status) return;
@@ -31,7 +34,7 @@ function showFilePreviews(input) {
     const total = files.reduce((sum, f) => sum + f.size, 0);
     const tooMany = files.length > MAX_FILES;
     const tooBig = total > MAX_TOTAL_BYTES;
-    input.setCustomValidity(tooMany ? `Please choose up to ${MAX_FILES} files.` : tooBig ? "The files are larger than 10 MB in total." : "");
+    input.setCustomValidity(tooMany ? tr("form.tooMany", {max: MAX_FILES}) : tooBig ? tr("form.tooBig") : "");
     if (tooMany || tooBig) { box.textContent = input.validationMessage; return false; }
     files.forEach(file => {
         const item = document.createElement("div");
@@ -46,7 +49,7 @@ function showFilePreviews(input) {
             item.appendChild(img);
         }
         const name = document.createElement("span");
-        name.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+        name.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(1)} ${tr("unit.mb")})`;
         item.appendChild(name);
         box.appendChild(item);
     });
@@ -73,13 +76,13 @@ function checkDemoCard(form) {
     const card = form.querySelector("#card-number");
     const expiry = form.querySelector("#expiry-date");
     const cvv = form.querySelector("#cvv-code");
-    card.setCustomValidity(luhnValid(card.value) ? "" : "Please check the card number.");
+    card.setCustomValidity(luhnValid(card.value) ? "" : tr("form.badCard"));
     const m = expiry.value.trim().match(/^(\d{2})\s*\/\s*(\d{2})$/);
     const now = new Date();
     const expiryOk = m && +m[1] >= 1 && +m[1] <= 12 &&
         new Date(2000 + +m[2], +m[1], 1) > new Date(now.getFullYear(), now.getMonth(), 1);
-    expiry.setCustomValidity(expiryOk ? "" : "Use the MM/YY format and a date in the future.");
-    cvv.setCustomValidity(/^\d{3,4}$/.test(cvv.value.trim()) ? "" : "CVV is 3 or 4 digits.");
+    expiry.setCustomValidity(expiryOk ? "" : tr("form.badExpiry"));
+    cvv.setCustomValidity(/^\d{3,4}$/.test(cvv.value.trim()) ? "" : tr("form.badCvv"));
 }
 
 function closeModalSoon(form) {
@@ -101,7 +104,7 @@ function sendForm(form) {
         document.body.appendChild(frame);
     }
     if (frame.dataset.pending === 'true') {
-        setFormStatus(form, 'Another message is still being submitted. Please wait.', 'error');
+        setFormStatus(form, tr('form.busy'), 'error');
         return;
     }
     frame.dataset.pending = 'true';
@@ -137,9 +140,9 @@ function sendForm(form) {
         // Первичная загрузка пустого iframe ещё не является ответом сервиса.
         try { if (frame.contentWindow.location.href === 'about:blank') return; } catch (_) { /* Внешний ответ недоступен по same-origin policy. */ }
         // load не доказывает доставку письма: сохраняем заполненные поля и вложения.
-        finish('Your browser submitted the form. Delivery has not been confirmed; keep a copy of your message.');
+        finish(tr('form.submitted'));
     };
-    timeout = setTimeout(() => finish('Delivery could not be confirmed. Your fields are preserved; please try again later.'), 30000);
+    timeout = setTimeout(() => finish(tr('form.unconfirmed')), 30000);
     form.submit(); // submit() не вызывает обработчик submit — повторной отправки не будет
     added.forEach(input => input.remove());
 }
@@ -161,16 +164,16 @@ function initSiteForms() {
                 return;
             }
             if (form.dataset.demo) {
-                setFormStatus(form, "Thank you! This is a demo: nothing was charged and no card data left your browser.", "ok");
+                setFormStatus(form, tr("form.demoThanks"), "ok");
                 form.reset();
                 closeModalSoon(form);
                 return;
             }
             if (!FORM_ENDPOINT) {
-                setFormStatus(form, "Sending is not connected yet. Please try again later.", "error");
+                setFormStatus(form, tr("form.notConnected"), "error");
                 return;
             }
-            setFormStatus(form, "Sending…");
+            setFormStatus(form, tr("form.sending"));
             sendForm(form);
         });
     });

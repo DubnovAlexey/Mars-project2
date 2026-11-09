@@ -1,0 +1,124 @@
+/* CSS/i18n.css
+   Переключатель языка в шапке (его разметку даёт js/i18n.js, вставляет js/common.js) и раскладка для иврита.
+   Переключатель стоит в верхнем углу шапки на любой ширине: справа, а в иврите — слева. */
+
+/* ======= Переключатель языка ======= */
+#site-header-container header {
+    position: relative;
+}
+
+.lang-switch {
+    position: absolute;
+    top: 0.6rem;
+    inset-inline-end: 0.75rem;
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font: 400 0.9rem/1.2 'Roboto', sans-serif;
+    letter-spacing: 0;
+}
+
+.lang-switch__icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: #ffd6a8;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 4px rgba(255, 120, 40, 0.6));
+}
+
+.lang-switch select {
+    min-height: 36px;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid rgba(255, 214, 168, 0.65);
+    border-radius: 8px;
+    background: rgba(40, 8, 4, 0.72);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.lang-switch select:hover,
+.lang-switch select:focus-visible {
+    border-color: #ffd6a8;
+    box-shadow: 0 0 0 2px rgba(255, 214, 168, 0.4);
+    outline: none;
+}
+
+.lang-switch option {
+    background: #fff;
+    color: #222;
+}
+
+/* Пока шапка узкая, крупное название страницы опускается ниже, чтобы не заходить под переключатель.
+   «html» в селекторе — чтобы правило не перебивал CSS/about.css, который подключается позже. */
+@media (max-width: 991.98px) {
+    html #site-header-container header {
+        padding-top: 3.4rem;
+    }
+}
+
+/* ======= Иврит: справа налево ======= */
+html[dir="rtl"] h2 {
+    text-align: right;
+    border-left: 0;
+    border-right: 5px solid #b22222;
+}
+
+html[dir="rtl"] article,
+html[dir="rtl"] th,
+html[dir="rtl"] td,
+html[dir="rtl"] .mars-card,
+html[dir="rtl"] .gallery-caption,
+html[dir="rtl"] .home-intro,
+html[dir="rtl"] .nasa-intro,
+html[dir="rtl"] .nasa-status,
+html[dir="rtl"] .nasa-item,
+html[dir="rtl"] .nasa-modal .modal-body {
+    text-align: right;
+}
+
+html[dir="rtl"] .back-to-top {
+    right: auto;
+    left: 20px;
+}
+
+html[dir="rtl"] .badge-abs {
+    right: auto;
+    left: 10px;
+}
+
+html[dir="rtl"] .figure-caption {
+    left: auto;
+    right: 8px;
+}
+
+html[dir="rtl"] .img-left {
+    float: right;
+    margin: 0 0 1rem 2rem;
+}
+
+html[dir="rtl"] .note-static {
+    border-left: 0;
+    border-right: 4px solid #bbb;
+}
+
+/* Главная: планета встаёт слева, лента-бейдж — на её левом углу */
+html[dir="rtl"] .planet-float {
+    float: left;
+    margin: 0 2rem 2rem 0;
+}
+
+html[dir="rtl"] .figure-planet .badge {
+    right: auto;
+    left: -8px;
+}
+
+/* Кнопки плеера ⏮ ⏯ ⏭ остаются в привычном порядке слева направо */
+html[dir="rtl"] .site-audio-controls {
+    direction: ltr;
+}

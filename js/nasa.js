@@ -70,7 +70,8 @@ window.nasa = (function () {
     function formatDate(value) {
         const d = new Date(value);
         if (isNaN(d)) return "";
-        return d.toLocaleDateString("en-US", {year: "numeric", month: "short", day: "numeric"});
+        // Дата в привычном для выбранного языка виде (js/i18n.js)
+        return d.toLocaleDateString(window.i18n ? window.i18n.locale : "en-US", {year: "numeric", month: "short", day: "numeric"});
     }
 
     function shorten(text, max) {
@@ -107,14 +108,14 @@ window.nasa = (function () {
             wasPlaying = !!music && !music.paused;
             if (wasPlaying) music.pause();
             const toggle = document.getElementById("site-audio-toggle");
-            if (toggle && wasPlaying) toggle.textContent = "Play";
+            if (toggle && wasPlaying) toggle.textContent = window.i18n ? window.i18n.t("player.play") : "Play";
         });
         modalEl.addEventListener("hidden.bs.modal", () => {
             const music = document.getElementById("site-audio");
             if (wasPlaying && music) {
                 music.play().then(() => {
                     const toggle = document.getElementById("site-audio-toggle");
-                    if (toggle) toggle.textContent = "Pause";
+                    if (toggle) toggle.textContent = window.i18n ? window.i18n.t("player.pause") : "Pause";
                 }).catch(() => {
                 });
             }
