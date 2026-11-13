@@ -307,7 +307,43 @@
             `<path d="M44 34 L52 48 L46 58 M60 30 L66 40" stroke="rgba(255,255,255,.9)" stroke-width="1.2" fill="none"/>` +
             `<path d="M32 88 q4 -8 10 -6" stroke="#9e0b0b" stroke-width="4" fill="none" stroke-linecap="round"/>`
     };
-    const ORGAN_SIZE = {eye: [84, 116], liver: [110, 150], hand: [100, 140], finger: [70, 96], tooth: [62, 84], ear: [84, 114], brain: [96, 130], helmet: [110, 150]};
+    const ORGAN_SIZE = {eye: [84, 116], liver: [110, 150], hand: [100, 140], finger: [70, 96], tooth: [62, 84], ear: [84, 114], brain: [96, 130], helmet: [110, 150], suit: [110, 150]};
+
+    // Натуральные части (13.11.2026): реалистичные вырезанные фото лежат в папке organs/ рядом с этим скриптом.
+    // Если фото загрузилось, часть показывается фото, иначе — прежним рисунком SVG выше. Кусок скафандра (suit)
+    // есть только фото, поэтому без него он просто не выпадает. Кляксы на стекле — тоже фото, поверх — живые подтёки.
+    const ORGAN_PHOTOS = {eye: "eye", liver: "liver", hand: "hand", finger: "finger", tooth: "teeth", ear: "ear", brain: "brain", helmet: "glass", suit: "suit"};
+    const SPLAT_PHOTOS = ["splat-1", "splat-2", "goo"];
+    const scriptUrl = document.currentScript ? document.currentScript.src : location.href;
+    const photos = {};
+    // Загрузка фото заранее: часть получает фото, только если оно уже готово к показу
+    function preloadPhoto(name) {
+        const img = new Image();
+        img.src = new URL("organs/" + name + ".webp", scriptUrl).href;
+        img.onload = () => { photos[name] = img.src; };
+    }
+    Object.values(ORGAN_PHOTOS).concat(SPLAT_PHOTOS).forEach(preloadPhoto);
+    // Какие части может «выбросить» взрыв: все нарисованные плюс те, у которых есть только фото
+    function organKinds() {
+        return Object.keys(ORGAN_SIZE).filter((kind) => ORGANS[kind] || photos[ORGAN_PHOTOS[kind]]);
+    }
+    // Разметка части: фото, если оно есть, иначе рисунок
+    function organMarkup(kind) {
+        const photo = photos[ORGAN_PHOTOS[kind]];
+        return photo ? `<img src="${photo}" alt="" draggable="false">`
+            : `<svg viewBox="0 0 100 100" aria-hidden="true">${ORGANS[kind](`martian-organ-${uid++}`)}</svg>`;
+    }
+    // Клякса: фото брызг, повёрнутое как попало, и поверх — стекающие подтёки и капли из splatSVG.
+    // Зелёная слизь — редко, чаще кровь; если фото нет — прежняя нарисованная клякса.
+    function splatMarkup(color, brainy) {
+        // Кровь с мозгами — чаще там, где прилетел мозг; чистая кровь — всегда; слизь — в каждой четвёртой кляксе
+        const blood = ["splat-1", "splat-2"].filter((name) => photos[name] && (name === "splat-1" || brainy || Math.random() < 0.3));
+        const goo = Boolean(photos["goo"]) && Math.random() < 0.25;
+        if (!blood.length && !goo) return splatSVG(color, brainy);
+        const name = goo || !blood.length ? "goo" : pick(blood);
+        return `<img class="martian-splat-photo" src="${photos[name]}" alt="" draggable="false" style="transform: rotate(${Math.round(rand(-180, 180))}deg)">` +
+            splatSVG(name === "goo" ? pick(GOO) : color, false, true);
+    }
 
     // Вспышка в момент взрыва
     function explode(x, y) {
@@ -329,7 +365,7 @@
         organ.style.width = organ.style.height = size + "px";
         organ.style.left = tx - size / 2 + "px";
         organ.style.top = ty - size / 2 + "px";
-        organ.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true">${ORGANS[kind](`martian-organ-${uid++}`)}</svg>`; // разметка из этого файла
+        organ.innerHTML = organMarkup(kind); // разметка из этого файла: фото части или рисунок
         organ.style.opacity = "0";
         stage.appendChild(organ);
         parts.push(organ);
@@ -352,7 +388,7 @@
             splat.style.height = splatSize * 260 / 220 + "px";
             splat.style.left = tx - splatSize / 2 + "px";
             splat.style.top = ty - splatSize * 0.42 + "px";
-            splat.innerHTML = splatSVG(pick(BLOOD), kind === "brain"); // разметка строится в этом файле из чисел
+            splat.innerHTML = splatMarkup(pick(BLOOD), kind === "brain"); // фото брызг или клякса, построенная из чисел
             stage.insertBefore(splat, organ);
             parts.push(splat);
             playSplat(0.55, kind === "helmet");
@@ -382,7 +418,7 @@
 
     // У каждого взорвавшегося марсианина свой набор частей, прилетающих в разное время
     function organsFrom(x, y) {
-        const kinds = Object.keys(ORGANS).sort(() => Math.random() - 0.5).slice(0, Math.round(rand(3, 5)));
+        const kinds = organKinds().sort(() => Math.random() - 0.5).slice(0, Math.round(rand(3, 5)));
         let delay = 120, done = 0;
         const parts = []; // кляксы и следы добавляются сюда по мере появления — в конце убираем всё разом
         for (const kind of kinds) {
@@ -394,7 +430,8 @@
 
     // Клякса как SVG: неровное пятно с выплесками-лучами, капли вокруг, подтёки вниз и влажный блик.
     // Форма каждый раз новая (случайные радиусы), поэтому две кляксы никогда не совпадают.
-    function splatSVG(color, brainy) {
+    // dripsOnly: только подтёки и капли — под ними уже лежит фото брызг
+    function splatSVG(color, brainy, dripsOnly = false) {
         const R = 46, points = [], count = 18;
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2;
@@ -433,6 +470,9 @@
                     `<path d="M${(x - w * 0.6).toFixed(1)} ${y.toFixed(1)} q${(w * 0.3).toFixed(1)} -4 ${(w * 0.6).toFixed(1)} 0 t${(w * 0.6).toFixed(1)} 0" stroke="#8e3a55" stroke-width="1.2" fill="none"/>`;
             }
         }
+        if (dripsOnly) {
+            return `<svg viewBox="-110 -110 220 260" aria-hidden="true"><g fill="${color}"><g class="martian-drips">${drips}</g>${drops}</g></svg>`;
+        }
         return `<svg viewBox="-110 -110 220 260" aria-hidden="true"><g fill="${color}">` +
             `<g class="martian-drips">${drips}</g><path d="${d}"/>${drops}</g>` +
             `<path d="${d}" fill="none" stroke="rgba(40,0,0,.45)" stroke-width="3"/>${chunks}` +
@@ -452,7 +492,7 @@
             blob.style.left = rand(0.06, 0.86) * window.innerWidth - size / 2 + "px";
             blob.style.top = rand(0.05, 0.6) * window.innerHeight - size / 2 + "px";
             blob.style.animationDelay = i * 70 + "ms";
-            blob.innerHTML = splatSVG(pick(BLOOD), Math.random() < 0.3); // разметка строится в этом файле из чисел
+            blob.innerHTML = splatMarkup(pick(BLOOD), Math.random() < 0.3); // фото брызг или клякса, построенная из чисел
             stage.appendChild(blob);
             blobs.push(blob);
         }
@@ -471,6 +511,8 @@
             const m = music();
             const volume = (m ? m.volume : 0.5) * 0.75 * strength;
             if (volume <= 0) return;
+            // старый Safari знает Web Audio только под именем webkitAudioContext
+            // noinspection JSUnresolvedReference
             audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === "suspended") audioCtx.resume();
             const now = audioCtx.currentTime;
@@ -511,12 +553,14 @@
             const m = music();
             const volume = (m ? m.volume : 0.5) * 0.35;
             if (volume <= 0) return;
+            // старый Safari знает Web Audio только под именем webkitAudioContext
+            // noinspection JSUnresolvedReference
             audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === "suspended") audioCtx.resume();
             const now = audioCtx.currentTime;
             ["square", "sawtooth"].forEach((type, i) => {
                 const oscillator = audioCtx.createOscillator();
-                oscillator.type = type;
+                oscillator.type = /** @type {OscillatorType} */ (type);
                 oscillator.frequency.setValueAtTime(1700 + i * 40, now);
                 oscillator.frequency.exponentialRampToValueAtTime(240, now + 0.2);
                 const gain = audioCtx.createGain();
@@ -660,7 +704,7 @@
         martian.el.classList.remove("quiet");    // теперь он танцует — и ему конец
         martian.el.style.transform = martian.spot.shown;
         updateHint();
-        runQueue();
+        runQueue().catch(() => {}); // очередь взрывов живёт сама по себе, ждать её не нужно
     }
 
     // Ждём, но прерываемся, если музыку выключили
@@ -702,7 +746,7 @@
         const x = head.left + head.width / 2, y = head.top + head.height * 0.45;
         explode(x, y);
         playSplat(0.8, true);
-        aftermath(martian, organsFrom(x, y));
+        aftermath(martian, organsFrom(x, y)).catch(() => {}); // развязка идёт сама, ждать её не нужно
     }
 
     // Развязка: тело без головы вылезает целиком, ощупывает шею, машет, падает и уползает; части на стекле тают
