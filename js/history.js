@@ -252,6 +252,10 @@ function generateHistoryContent() {
             // Обёртка с горизонтальной прокруткой: на телефоне широкая таблица не растягивает страницу
             const tableWrap = document.createElement('div');
             tableWrap.className = 'table-responsive';
+            // Прокручиваемую область должно быть можно прокрутить и с клавиатуры: фокус Tab и имя для экранного диктора
+            tableWrap.tabIndex = 0;
+            tableWrap.setAttribute('role', 'region');
+            tableWrap.setAttribute('aria-label', article.querySelector('h2, h3')?.textContent?.trim() || document.title);
             tableWrap.appendChild(table);
             article.appendChild(tableWrap);
         }

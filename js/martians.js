@@ -322,7 +322,12 @@
         img.src = new URL("organs/" + name + ".webp", scriptUrl).href;
         img.onload = () => { photos[name] = img.src; };
     }
-    Object.values(ORGAN_PHOTOS).concat(SPLAT_PHOTOS).forEach(preloadPhoto);
+    // Сначала — список готовых фото (organs/list.json пишет сборка): сервер не просят о файлах, которых ещё нет,
+    // и консоль сайта остаётся чистой. Нет списка или открыто с диска — остаются рисунки SVG.
+    fetch(new URL("organs/list.json", scriptUrl).href)
+        .then((response) => (response.ok ? response.json() : []))
+        .then((ready) => Object.values(ORGAN_PHOTOS).concat(SPLAT_PHOTOS).filter((name) => ready.includes(name)).forEach(preloadPhoto))
+        .catch(() => { /* рисунки SVG остаются */ });
     // Какие части может «выбросить» взрыв: все нарисованные плюс те, у которых есть только фото
     function organKinds() {
         return Object.keys(ORGAN_SIZE).filter((kind) => ORGANS[kind] || photos[ORGAN_PHOTOS[kind]]);
