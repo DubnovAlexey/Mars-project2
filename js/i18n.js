@@ -212,6 +212,21 @@
             fr: "Atterrissages, trajets, vols et projets d’avenir — directement depuis la bibliothèque ouverte NASA Image and Video Library. Chaque vidéo s’ouvre ici, sur cette page, et la musique de fond se met en pause pendant que vous regardez."
         },
         "videos.watch": {en: "▶ Watch", ru: "▶ Смотреть", he: "▶ צפייה", es: "▶ Ver", fr: "▶ Regarder"},
+        // Под описанием видео: перевод сделал переводчик браузера — или его нет, и текст остался английским
+        "videos.machine": {
+            en: "Machine translation by the browser.", ru: "Перевод машинный — переводчиком браузера.", he: "תרגום מכונה — של הדפדפן.",
+            es: "Traducción automática del navegador.", fr: "Traduction automatique du navigateur."
+        },
+        "videos.translating": {
+            en: "Translating the description with the browser…", ru: "Перевожу описание переводчиком браузера…", he: "מתרגם את התיאור בעזרת הדפדפן…",
+            es: "Traduciendo la descripción con el navegador…", fr: "Traduction de la description par le navigateur…"
+        },
+        "videos.englishOnly": {
+            en: "The NASA description is in English: this browser cannot translate by itself.", ru: "Описание от NASA — на английском: этот браузер не умеет переводить сам.",
+            he: "התיאור של NASA באנגלית — הדפדפן הזה לא יודע לתרגם בעצמו.",
+            es: "La descripción de la NASA está en inglés: este navegador no traduce por sí solo.",
+            fr: "La description de la NASA est en anglais, ce navigateur ne sait pas traduire seul."
+        },
         "videos.credit": {en: "Video: NASA", ru: "Видео: NASA", he: "וידאו: NASA", es: "Vídeo: NASA", fr: "Vidéo : NASA"},
         "videos.loadError": {
             en: "This video cannot be loaded right now. Try again later or open it in the NASA library: https://images.nasa.gov",

@@ -80,6 +80,86 @@ const videoSections = [
 const vt = (key, vars) => window.i18n ? window.i18n.t(key, vars) : key;
 const vpick = value => window.i18n ? window.i18n.pick(value) : value.en;
 
+// 1а. Перевод названий и описаний НАСА на язык страницы (14.11, просьба Алексея: «подписи под видео…
+// переводились… и в описании»). Видео приходят от НАСА на лету и только по-английски, список меняется каждый
+// день, поэтому переводит встроенный переводчик браузера (Translator API, Chrome 138+): прямо на компьютере
+// посетителя, бесплатно, без ключей, текст никуда не уходит. Готовые переводы запоминаются (localStorage).
+// Языковую модель браузер скачивает только после действия посетителя — до первого касания текст английский.
+// Нет переводчика — остаётся английский с честной пометкой под описанием.
+const TR_LANG = (window.i18n && window.i18n.lang) || "en";
+const TR_STORE = "mars:tr:" + TR_LANG + ":";
+let translatorReady = null;
+let translateChain = Promise.resolve();
+const translateState = {used: false, failed: false};
+
+function textKey(text) {
+    let hash = 5381;
+    for (let i = 0; i < text.length; i++) hash = ((hash * 33) ^ text.charCodeAt(i)) >>> 0;
+    return hash.toString(36) + text.length.toString(36);
+}
+
+function getTranslator() {
+    if (TR_LANG === "en" || !("Translator" in window)) return Promise.resolve(null);
+    if (!translatorReady) {
+        const options = {sourceLanguage: "en", targetLanguage: TR_LANG};
+        translatorReady = (async () => {
+            const state = await window.Translator.availability(options);
+            if (state === "unavailable") return null;
+            if (state !== "available" && !(navigator.userActivation && navigator.userActivation.isActive)) {
+                // Модель ещё не скачана: браузер разрешает загрузку только сразу после касания или клавиши
+                await new Promise(resolve => {
+                    window.addEventListener("pointerdown", resolve, {once: true});
+                    window.addEventListener("keydown", resolve, {once: true});
+                });
+            }
+            // Модель может качаться долго или не скачаться вовсе: минута — и страница честно остаётся английской
+            return await Promise.race([
+                window.Translator.create(options),
+                new Promise(resolve => setTimeout(() => resolve(null), 60000))
+            ]);
+        })().catch(() => null);
+    }
+    return translatorReady;
+}
+
+/** Перевод английского текста НАСА; null — перевести нечем (тогда остаётся английский) */
+function translateNasa(text) {
+    const clean = String(text || "").trim();
+    if (!clean || TR_LANG === "en") return Promise.resolve(null);
+    const key = TR_STORE + textKey(clean);
+    try {
+        const saved = localStorage.getItem(key);
+        if (saved) return Promise.resolve(saved);
+    } catch (e) { /* хранилище недоступно — переводим без запоминания */ }
+    // По одному переводу за раз: тридцать описаний сразу не нагружают компьютер посетителя
+    const job = translateChain.then(async () => {
+        const translator = await getTranslator();
+        if (!translator) { translateState.failed = true; return null; }
+        try {
+            const result = await translator.translate(clean);
+            translateState.used = true;
+            try { localStorage.setItem(key, result); } catch (e) { /* без запоминания */ }
+            return result;
+        } catch (e) {
+            translateState.failed = true;
+            return null;
+        }
+    });
+    translateChain = job.catch(() => null);
+    return job;
+}
+
+/** Пометка под описанием: идёт перевод, перевод машинный — или описание осталось английским */
+function translationNote(textEl, waiting) {
+    if (TR_LANG === "en") return;
+    let note = textEl.nextElementSibling;
+    if (!note || !note.classList.contains("nasa-translation-note")) {
+        note = nasa.el("p", "nasa-meta nasa-translation-note", "");
+        textEl.after(note);
+    }
+    note.textContent = vt(waiting ? "videos.translating" : translateState.used ? "videos.machine" : "videos.englishOnly");
+}
+
 const VIDEOS_PER_SECTION = 6;
 const VIDEO_CACHE_MS = 24 * 60 * 60 * 1000; // список видео обновляется раз в сутки
 
@@ -114,11 +194,20 @@ function createVideoCard(video) {
     img.loading = "lazy";
     card.appendChild(img);
 
-    card.appendChild(nasa.el("h3", "", video.info.title));
+    const title = nasa.el("h3", "", video.info.title);
+    card.appendChild(title);
     const center = video.info.center ? " · " + video.info.center : "";
     card.appendChild(nasa.el("p", "nasa-meta", nasa.formatDate(video.info.date_created) + center));
-    card.appendChild(nasa.el("p", "nasa-text", nasa.shorten(video.info.description, 140)));
+    const text = nasa.el("p", "nasa-text", nasa.shorten(video.info.description, 140));
+    card.appendChild(text);
     card.appendChild(nasa.el("span", "nasa-btn", vt("videos.watch")));
+    // Сначала английский от НАСА, потом — перевод на язык страницы, как только он готов
+    translateNasa(video.info.title).then(result => {
+        if (result) { title.textContent = result; img.alt = result; }
+    });
+    translateNasa(video.info.description).then(result => {
+        if (result) text.textContent = nasa.shorten(result, 140);
+    });
 
     nasa.makeClickable(card, () => openVideo(video));
     col.appendChild(card);
@@ -135,7 +224,16 @@ async function openVideo(video) {
     document.getElementById("nasaVideoTitle").textContent = video.info.title;
     document.getElementById("nasaVideoMeta").textContent =
         nasa.formatDate(video.info.date_created) + (video.info.center ? " · " + video.info.center : "") + " · " + vt("videos.credit");
-    document.getElementById("nasaVideoText").textContent = video.info.description || "";
+    const textEl = document.getElementById("nasaVideoText");
+    textEl.textContent = video.info.description || "";
+    translationNote(textEl, true); // «перевожу…» — пока не готово
+    // Название и полное описание — на языке страницы (из памяти мгновенно, иначе переводчиком браузера)
+    Promise.all([translateNasa(video.info.title), translateNasa(video.info.description)]).then(([title, text]) => {
+        if (request !== videoRequest) return;
+        if (title) document.getElementById("nasaVideoTitle").textContent = title;
+        if (text && textEl.textContent === (video.info.description || "")) textEl.textContent = text;
+        translationNote(textEl);
+    });
     player.removeAttribute("src");
     player.querySelectorAll("track").forEach(t => t.remove());
     player.poster = nasa.safeUrl(video.preview);

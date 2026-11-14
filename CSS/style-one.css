@@ -233,11 +233,8 @@ a:hover {
     padding-bottom: 75%;
 }
 
-/* Применяем hover-эффекты ко всем изображениям и видео во всех карточках */
-.card img:hover {
-    transform: scale(1.25); /* Увеличивает изображение */
-}
-
+/* Видео в карточках подрастает при наведении. Снимки не растут на месте: их крупную копию поверх страницы
+   показывает js/hover-zoom.js (×2,5–3, стили .zoom-peek в конце файла) */
 .card .video-container:hover {
     transform: scale(1.15); /* Увеличивает видео */
 }
@@ -352,12 +349,7 @@ a:hover {
     z-index: 1;
 }
 
-/* Эффект при наведении мыши на изображение */
-.mars-card img:hover {
-    transform: scale(1.5); /* Увеличивает изображение в 1.5 раза */
-
-}
-
+/* Снимок мифа под мышью показывает js/hover-zoom.js — крупной копией поверх страницы (×2,5–3) */
 .mars-card .video-container:hover {
     transform: scale(1.5); /* Увеличивает видео */
 }
@@ -451,28 +443,13 @@ a:hover {
 }
 
 /* ======= Подписи под фото галереи ======= */
-/* Наведённое фото растёт, как картинки на Myths и History, и поднимается над соседями.
-   z-index возвращается с задержкой, чтобы уменьшающееся фото не уходило под соседнее раньше времени. */
+/* Наведённое фото показывает js/hover-zoom.js — крупной копией поверх страницы, как снимки на Myths и History */
 .gallery-figure {
-    position: relative;
-    z-index: 1;
     margin: 0;
-    transition: z-index 0s 0.3s;
-}
-
-.gallery-figure:hover {
-    z-index: 10;
-    transition-delay: 0s;
 }
 
 .gallery-figure img {
     border-radius: 6px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.gallery-figure:hover img {
-    transform: scale(1.4);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
 }
 
 .gallery-caption {
@@ -541,4 +518,41 @@ a:hover {
 /* Подвал: снизу место под плавающую кнопку «Back to Top», чтобы она не закрывала последнюю ссылку подвала */
 #site-footer-container footer {
     padding-bottom: 4.5rem;
+}
+
+/* ======= Снимок под мышью: крупная копия поверх страницы (js/hover-zoom.js) ======= */
+/* Целиком, без обрезки, в марсианской рамке, как планета на главной; выше окон Bootstrap (1055),
+   чтобы превью вложения в форме тоже было видно. Копия не ловит мышь: клик по снимку работает как раньше. */
+.zoom-peek {
+    position: fixed;
+    z-index: 2000;
+    box-sizing: border-box;
+    pointer-events: none;
+    transform-origin: 0 0;
+    background: #fff;
+    border: 3px solid #b22222;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(139, 0, 0, 0.6);
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.25, 1), opacity 0.24s ease;
+}
+
+.zoom-peek img,
+.zoom-peek canvas { /* canvas — копия превью вложения в форме (её blob-ссылка уже отозвана) */
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none; /* общее правило img (500px, рамка, поля) копии не нужно: рамку рисует сама .zoom-peek */
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zoom-peek {
+        transition: none;
+    }
 }

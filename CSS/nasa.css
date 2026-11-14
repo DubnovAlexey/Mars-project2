@@ -60,10 +60,7 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.nasa-item img:hover {
-    transform: scale(1.5);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
-}
+/* Снимок под мышью показывает js/hover-zoom.js — крупной копией поверх страницы (×2,5–3), а не на месте */
 
 @media (prefers-reduced-motion: reduce) {
     .nasa-item,
